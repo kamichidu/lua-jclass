@@ -1,4 +1,4 @@
-require 'youjo'
+require 'bitwise'
 
 byte_reader= {}
 
@@ -21,7 +21,6 @@ function byte_reader.new(filename)
 
         local bytes= {}
 
-        print('buffer size is ' .. #(obj._buffer))
         if #(obj._buffer) > 0 then
             while #(obj._buffer) > 0 do
                 bytes[#bytes + 1]= table.remove(obj._buffer, 1)
@@ -34,26 +33,8 @@ function byte_reader.new(filename)
                 bytes[#bytes + 1]= v
             end
             return bytes
-            -- while #(bytes) < n and #(obj._buffer) > 0 do
-            --     local byte= table.remove(obj._buffer, 1)
-
-            --     bytes[#bytes + 1]= byte
-            -- end
-
-            -- if #bytes == n then
-            --     youjo.say('byte_reader return', bytes)
-            --     return bytes
-            -- else
-            --     for i, v in ipairs(obj.bytes(n - #bytes)) do
-            --         bytes[#bytes + 1]= v
-            --     end
-
-            --     youjo.say('byte_reader return', bytes)
-            --     return bytes
-            -- end
         end
 
-        print('read from file')
         local buf= obj._fh:read(obj._buf_size)
 
         for c in (buf or ''):gmatch('.') do
@@ -61,7 +42,6 @@ function byte_reader.new(filename)
         end
 
         if #(obj._buffer) > 0 then
-            youjo.say('byte_reader return', bytes)
             return obj.bytes(n)
         else
             error(string.format('L41'))

@@ -1,5 +1,5 @@
 require 'byte_reader'
-require 'class_file'
+require 'jclass'
 
 if not (#arg >= 1) then
     error('usage: lua {script name} {java class file}')
@@ -7,21 +7,7 @@ end
 
 -- local br= byte_reader.new('../../c++/cpp-jclass/PublicClass.class')
 local br= byte_reader.new(arg[1])
-
-local constants= {
-    cp_info_tag= {
-    },
-    access_flag= {
-        public=     0x0001,
-        final=      0x0010,
-        super=      0x0020,
-        interface=  0x0200,
-        abstract=   0x0400,
-        synthetic=  0x1000,
-        annotation= 0x2000,
-        enum=       0x4000,
-    },
-}
+local jc= jclass.new(br)
 
 local stringify= {}
 function stringify.access_flag(bits)
@@ -39,16 +25,44 @@ function stringify.access_flag(bits)
     return table.concat(identifies, ' ')
 end
 
-local class_file= class_file.new(br)
+br.close()
 
-for k, v in pairs(class_file) do
-    if k == '_access_flags' then
-        print(stringify.access_flag(v))
-    elseif type(v) == type({}) then
-        print(k, #v)
+print('version', jc.version())
+print('public', jc.is_public())
+print('super', jc.is_super())
+print('classname', jc.classname())
+print('superclassname', jc.super_classname())
+
+for i, field in ipairs(jc.fields()) do
+    local mod= ''
+    if field.is_public() then
+        mod= '+'
+    elseif field.is_private() then
+        mod= '-'
+    elseif field.is_protected() then
+        mod= '#'
     else
-        print(k, v)
+        mod= '&'
     end
+    print('', mod, field.name(), field.type())
 end
 
-br.close()
+for i, method in ipairs(jc.methods()) do
+    local mod= ''
+    if method.is_public() then
+        mod= '+'
+    elseif method.is_private() then
+        mod= '-'
+    elseif method.is_protected() then
+        mod= '#'
+    else
+        mod= '&'
+    end
+
+    local params= {}
+    for i, param in ipairs(method.parameter_types()) do
+        params[#params + 1]= param
+    end
+
+    print('', mod .. ' ' .. method.name() .. '(' .. table.concat(method.parameter_types(), ', ') .. ')' .. ' : ' .. method.return_type())
+end

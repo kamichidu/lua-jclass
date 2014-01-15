@@ -4,22 +4,41 @@ require 'method_info'
 require 'field_info'
 require 'attribute_info'
 
-class_file= {}
+class_file= {
+    access_flag= {
+        public=     0x0001, -- Declared public; may be accessed from outside its package.
+        final=      0x0010, -- Declared final; no subclasses allowed.
+        super=      0x0020, -- Treat superclass methods specially when invoked by the invokespecial instruction.
+        interface=  0x0200, -- Is an interface, not a class.
+        abstract=   0x0400, -- Declared abstract; must not be instantiated.
+        synthetic=  0x1000, -- Declared synthetic; not present in the source code.
+        annotation= 0x2000, -- Declared as an annotation type.
+        enum=       0x4000, -- Declared as an enum type. 
+    },
+}
 
 function class_file.new(reader)
+    -- read datas
     local magic=         reader.int32()
+
+    if not magic == 0xcafebabe then
+        error("it's not java class file.")
+    end
+
     local minor_version= reader.int16()
     local major_version= reader.int16()
     local constant_pool_count= reader.int16()
     local constant_pools= {}
 
-    youjo.say('read constant_pool_count is ' .. constant_pool_count)
     while #(constant_pools) < constant_pool_count - 1 do
         local size= #(constant_pools)
+        local info= constant_pool_info.new(reader)
 
-        youjo.say('before cp_info.new()')
-        constant_pools[size + 1]= constant_pool_info.new(reader)
-        youjo.say('after read now #constant_pools is ' .. #constant_pools)
+        constant_pools[size + 1]= info
+
+        if info.kind == 'long' or info.kind == 'double' then
+            constant_pools[#constant_pools + 1]= {}
+        end
     end
 
     local access_flags= reader.int16()
@@ -43,21 +62,21 @@ function class_file.new(reader)
         fields[size + 1]= field_info.new(reader)
     end
 
-    -- local methods_count= reader.int16()
-    -- local methods= {}
-    -- while #(methods) < methods_count do
-    --     local size= #(methods)
+    local methods_count= reader.int16()
+    local methods= {}
+    while #(methods) < methods_count do
+        local size= #(methods)
 
-    --     methods[size + 1]= method_info.new(reader)
-    -- end
+        methods[size + 1]= method_info.new(reader)
+    end
 
-    -- local attributes_count= reader.int16()
-    -- local attributes= {}
-    -- while #(attributes) < attributes_count do
-    --     local size= #(attributes)
+    local attributes_count= reader.int16()
+    local attributes= {}
+    while #(attributes) < attributes_count do
+        local size= #(attributes)
 
-    --     attributes[size + 1]= attribute_info.new(reader)
-    -- end
+        attributes[size + 1]= attribute_info.new(reader)
+    end
 
     return {
         _magic=               magic,
