@@ -1,7 +1,15 @@
+--[[!
+-- @file
+-- @brief binary based file reader
+--]]
 require 'bitwise'
 
 byte_reader= {}
 
+---
+-- @method byte_reader.new
+-- @param filename {string} filename to be read
+-- @return a object
 function byte_reader.new(filename)
     local obj= {
         _fh= io.open(filename, 'rb'),

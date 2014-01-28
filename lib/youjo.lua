@@ -40,3 +40,13 @@ function youjo.pretty(o)
         return '' .. o
     end
 end
+
+function youjo.decode_utf8(bytes)
+    local utf8= ''
+
+    for i, byte in ipairs(bytes) do
+        utf8= utf8 .. string.char(byte)
+    end
+
+    return utf8
+end
