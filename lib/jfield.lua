@@ -1,6 +1,6 @@
-require 'accessible_object'
-require 'parser'
-require 'youjo'
+require 'raw.accessible_object'
+require 'util.parser'
+require 'util.youjo'
 
 jfield= {}
 

@@ -1,4 +1,4 @@
-require 'attribute_info'
+require 'raw.attribute_info'
 
 method_info= {
     access_flag= {

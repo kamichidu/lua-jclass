@@ -1,11 +1,11 @@
-require 'class_file'
-require 'parser'
-require 'bitwise'
-require 'byte_reader'
-require 'accessible_object'
 require 'jfield'
 require 'jmethod'
-require 'youjo'
+require 'raw.accessible_object'
+require 'raw.class_file'
+require 'util.bitwise'
+require 'util.byte_reader'
+require 'util.parser'
+require 'util.youjo'
 
 jclass= {}
 

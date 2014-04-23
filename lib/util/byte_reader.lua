@@ -2,7 +2,7 @@
 -- @file
 -- @brief binary based file reader
 --]]
-require 'bitwise'
+require 'util.bitwise'
 
 byte_reader= {}
 

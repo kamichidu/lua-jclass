@@ -5,19 +5,19 @@ package.path= './lib/?.lua;' .. package.path
 require 'Test.More'
 
 local modules= {
-    'accessible_object',
-    'attribute_info',
-    'bitwise',
-    'byte_reader',
-    'class_file',
-    'constant_pool_info',
-    'field_info',
     'jclass',
     'jfield',
     'jmethod',
-    'method_info',
-    'parser',
-    'youjo',
+    'raw.accessible_object',
+    'raw.attribute_info',
+    'raw.class_file',
+    'raw.constant_pool_info',
+    'raw.field_info',
+    'raw.method_info',
+    'util.bitwise',
+    'util.byte_reader',
+    'util.parser',
+    'util.youjo',
 }
 
 plan(#modules)

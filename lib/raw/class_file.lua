@@ -1,8 +1,8 @@
-require 'youjo'
-require 'constant_pool_info'
-require 'method_info'
-require 'field_info'
-require 'attribute_info'
+require 'raw.attribute_info'
+require 'raw.constant_pool_info'
+require 'raw.field_info'
+require 'raw.method_info'
+require 'util.youjo'
 
 class_file= {
     access_flag= {

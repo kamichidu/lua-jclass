@@ -1,4 +1,4 @@
-require 'bitwise'
+require 'util.bitwise'
 
 local access_flag= {
     public=     0x0001, -- Declared public; may be accessed from outside its package.
