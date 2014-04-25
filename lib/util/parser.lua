@@ -1,4 +1,8 @@
-local parser= {}
+local prototype= require 'prototype'
+
+local parser= prototype {
+    default= prototype.assignment_copy,
+}
 
 local
 function parse_error(s, p)
@@ -126,7 +130,7 @@ function return_descriptor(s, p)
     end
 end
 
-function parser.parse_field_descriptor(s)
+function parser:parse_field_descriptor(s)
     local t, p= field_type(s, 1)
 
     return {
@@ -134,7 +138,7 @@ function parser.parse_field_descriptor(s)
     }
 end
 
-function parser.parse_method_descriptor(s)
+function parser:parse_method_descriptor(s)
     local p= 1
     local c= char(s, p)
 

@@ -8,8 +8,8 @@ if not (#arg >= 1) then
 end
 
 -- local br= byte_reader.new('../../c++/cpp-jclass/PublicClass.class')
-local br= byte_reader.new(arg[1])
-local jc= jclass.new(br)
+local br= byte_reader:new(arg[1])
+local jc= jclass:new(br)
 
 local stringify= {}
 function stringify.access_flag(bits)

@@ -2,15 +2,18 @@
 -- @file
 -- @brief binary based file reader
 --]]
-local bitwise= require 'util.bitwise'
+local prototype= require 'prototype'
+local bitwise=   require 'util.bitwise'
 
-local byte_reader= {}
+local byte_reader= prototype {
+    default= prototype.no_copy,
+}
 
 ---
 -- @method byte_reader.new
 -- @param filename {string} filename to be read
 -- @return a object
-function byte_reader.new(filename)
+function byte_reader:new(filename)
     local obj= {
         _fh= io.open(filename, 'rb'),
         _buffer= {},

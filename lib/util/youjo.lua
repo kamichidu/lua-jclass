@@ -1,10 +1,14 @@
-local youjo= {}
+local prototype= require 'prototype'
 
-function youjo.say(message, ...)
+local youjo= prototype {
+    default= prototype.no_copy,
+}
+
+function youjo:say(message, ...)
     print(message .. ': ' .. table.concat(... or {}, ', '))
 end
 
-function youjo.say_utf8(message, ...)
+function youjo:say_utf8(message, ...)
     local s= ''
     for i, b in ipairs(... or {}) do
         s= s .. string.char(b)
@@ -31,7 +35,7 @@ end
 local function pretty_string(o)
     return '"' .. o .. '"'
 end
-function youjo.pretty(o)
+function youjo:pretty(o)
     if type(o) == type({}) then
         return pretty_table(o)
     elseif type(o) == type('') then
@@ -41,7 +45,7 @@ function youjo.pretty(o)
     end
 end
 
-function youjo.decode_utf8(bytes)
+function youjo:decode_utf8(bytes)
     local utf8= ''
 
     for i, byte in ipairs(bytes) do
