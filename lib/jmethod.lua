@@ -1,8 +1,8 @@
-require 'raw.accessible_object'
-require 'util.parser'
-require 'util.youjo'
+local accessible_object= require 'raw.accessible_object'
+local parser=            require 'util.parser'
+local youjo=             require 'util.youjo'
 
-jmethod= {}
+local jmethod= {}
 
 function jmethod.new(constant_pools, method_info)
     -- descriptor_info must be utf8_info
@@ -28,3 +28,5 @@ function jmethod.new(constant_pools, method_info)
 
     return obj
 end
+
+return jmethod

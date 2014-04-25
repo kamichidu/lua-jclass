@@ -20,10 +20,11 @@ local modules= {
     'util.youjo',
 }
 
-plan(#modules)
+plan('no_plan')
 
 for i, module in ipairs(modules) do
     require_ok(module)
+    type_ok(require(module), 'table', 'require(' .. module .. ') should return table')
 end
 
 done_testing()

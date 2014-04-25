@@ -1,13 +1,13 @@
-require 'jfield'
-require 'jmethod'
-require 'raw.accessible_object'
-require 'raw.class_file'
-require 'util.bitwise'
-require 'util.byte_reader'
-require 'util.parser'
-require 'util.youjo'
+local jfield=            require 'jfield'
+local jmethod=           require 'jmethod'
+local accessible_object= require 'raw.accessible_object'
+local class_file=        require 'raw.class_file'
+local bitwise=           require 'util.bitwise'
+local byte_reader=       require 'util.byte_reader'
+local parser=            require 'util.parser'
+local youjo=             require 'util.youjo'
 
-jclass= {}
+local jclass= {}
 
 function jclass.from_file(filename)
     return jclass.new(byte_reader.new(filename))
@@ -77,3 +77,5 @@ function jclass.new(reader)
 
     return obj
 end
+
+return jclass

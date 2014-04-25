@@ -1,4 +1,4 @@
-attribute_info= {}
+local attribute_info= {}
 
 function attribute_info.new(reader)
     local attribute_name_index= reader.int16()
@@ -17,3 +17,5 @@ function attribute_info.new(reader)
         _info=                 info,
     }
 end
+
+return attribute_info

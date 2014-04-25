@@ -1,10 +1,10 @@
-require 'raw.attribute_info'
-require 'raw.constant_pool_info'
-require 'raw.field_info'
-require 'raw.method_info'
-require 'util.youjo'
+local attribute_info=     require 'raw.attribute_info'
+local constant_pool_info= require 'raw.constant_pool_info'
+local field_info=         require 'raw.field_info'
+local method_info=        require 'raw.method_info'
+local youjo=              require 'util.youjo'
 
-class_file= {
+local class_file= {
     access_flag= {
         public=     0x0001, -- Declared public; may be accessed from outside its package.
         final=      0x0010, -- Declared final; no subclasses allowed.
@@ -97,3 +97,5 @@ function class_file.new(reader)
         _attributes=          attributes,
     }
 end
+
+return class_file

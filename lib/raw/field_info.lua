@@ -1,6 +1,6 @@
-require 'raw.attribute_info'
+local attribute_info= require 'raw.attribute_info'
 
-field_info= {
+local field_info= {
 }
 
 function field_info.new(reader)
@@ -22,3 +22,5 @@ function field_info.new(reader)
         _attributes=       attributes,
     }
 end
+
+return field_info

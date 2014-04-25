@@ -2,9 +2,9 @@
 -- @file
 -- @brief binary based file reader
 --]]
-require 'util.bitwise'
+local bitwise= require 'util.bitwise'
 
-byte_reader= {}
+local byte_reader= {}
 
 ---
 -- @method byte_reader.new
@@ -63,11 +63,11 @@ function byte_reader.new(filename)
             error(string.format('L49'))
         end
 
-        return bit32.bor(
-            bit32.lshift(bytes[1], 24),
-            bit32.lshift(bytes[2], 16),
-            bit32.lshift(bytes[3], 8),
-            bit32.lshift(bytes[4], 0)
+        return bitwise.bor(
+            bitwise.lshift(bytes[1], 24),
+            bitwise.lshift(bytes[2], 16),
+            bitwise.lshift(bytes[3], 8),
+            bitwise.lshift(bytes[4], 0)
         )
     end
 
@@ -78,9 +78,9 @@ function byte_reader.new(filename)
             error(string.format('L64'))
         end
 
-        return bit32.bor(
-            bit32.lshift(bytes[1], 8),
-            bit32.lshift(bytes[2], 0)
+        return bitwise.bor(
+            bitwise.lshift(bytes[1], 8),
+            bitwise.lshift(bytes[2], 0)
         )
     end
 
@@ -100,3 +100,5 @@ function byte_reader.new(filename)
 
     return obj
 end
+
+return byte_reader

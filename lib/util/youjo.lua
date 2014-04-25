@@ -1,4 +1,4 @@
-youjo= {}
+local youjo= {}
 
 function youjo.say(message, ...)
     print(message .. ': ' .. table.concat(... or {}, ', '))
@@ -50,3 +50,5 @@ function youjo.decode_utf8(bytes)
 
     return utf8
 end
+
+return youjo

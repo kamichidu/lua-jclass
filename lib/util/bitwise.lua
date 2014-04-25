@@ -1,4 +1,8 @@
-if not bit32 then
+if bit32 then
+    return bit32
+elseif bit then
     -- for luajit
-    bit32= require 'bit'
+    return require('bit')
+else
+    error('bit operation not supported.')
 end

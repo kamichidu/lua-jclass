@@ -1,6 +1,6 @@
-require 'raw.attribute_info'
+local attribute_info= require 'raw.attribute_info'
 
-method_info= {
+local method_info= {
     access_flag= {
         public=       0x0001, -- Declared public; may be accessed from outside its package.
         private=      0x0002, -- Declared private; accessible only within the defining class.
@@ -38,3 +38,5 @@ function method_info.new(reader)
         _attributes=       attributes,
     }
 end
+
+return method_info

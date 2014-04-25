@@ -1,4 +1,4 @@
-constant_pool_info= {}
+local constant_pool_info= {}
 
 local tag_kind= {
     class=                7,
@@ -161,3 +161,5 @@ function constant_pool_info.new(reader)
 
     return factories[tag](tag, reader)
 end
+
+return constant_pool_info

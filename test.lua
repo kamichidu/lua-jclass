@@ -1,5 +1,7 @@
-require 'byte_reader'
-require 'jclass'
+package.path= package.path .. ';./lib/?.lua'
+
+local byte_reader= require 'util.byte_reader'
+local jclass=      require 'jclass'
 
 if not (#arg >= 1) then
     error('usage: lua {script name} {java class file}')

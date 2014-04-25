@@ -1,8 +1,8 @@
-require 'raw.accessible_object'
-require 'util.parser'
-require 'util.youjo'
+local accessible_object= require 'raw.accessible_object'
+local parser=            require 'util.parser'
+local youjo=             require 'util.youjo'
 
-jfield= {}
+local jfield= {}
 
 function jfield.new(constant_pools, field_info)
     local descriptor_info= constant_pools[field_info._descriptor_index]
@@ -23,3 +23,5 @@ function jfield.new(constant_pools, field_info)
 
     return obj
 end
+
+return jfield

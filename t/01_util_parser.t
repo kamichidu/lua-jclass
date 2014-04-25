@@ -3,7 +3,8 @@
 package.path= './lib/?.lua;' .. package.path
 
 require 'Test.More'
-require 'util.parser'
+
+local parser= require 'util.parser'
 
 plan 'no_plan'
 

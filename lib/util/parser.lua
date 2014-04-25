@@ -1,4 +1,4 @@
-parser= {}
+local parser= {}
 
 local
 function parse_error(s, p)
@@ -163,3 +163,5 @@ function parser.parse_method_descriptor(s)
         return_type= ret_type,
     }
 end
+
+return parser
