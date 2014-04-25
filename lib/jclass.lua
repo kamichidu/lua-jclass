@@ -10,17 +10,16 @@ local youjo=             require 'util.youjo'
 
 local jclass= prototype {
     default= prototype.assignment_copy,
-    table=   prototype.deep_copy,
 }
 
-function jclass:from_file(filename)
+function jclass.parse_file(filename)
     return self:new(byte_reader.new(filename))
 end
 
-function jclass:new(reader)
+function jclass.for_name(reader)
     local class_file= class_file.new(reader)
 
-    local obj= setmetatable({}, {__index= accessible_object.new(class_file._access_flags)})
+    local obj= setmetatable({}, {__index= accessible_object:new(class_file._access_flags)})
 
     function obj.version()
         return tonumber(class_file._major_version .. '.' .. class_file._minor_version)
@@ -83,3 +82,153 @@ function jclass:new(reader)
 end
 
 return jclass
+
+--[[
+=pod
+
+=head1 NAME
+
+jclass - java class representation object
+
+=head1 VERSION
+
+still alpha ver.
+
+=head1 SYSNOPSIS
+
+    local jclass= require 'jclass'
+
+    local clazz= jclass:parse_file('path/to/java/util/List.class')
+
+    -- display 'java.util.List'
+    print(clazz:canonical_name())
+
+    for jfield_object in clazz:fields() do
+        -- see `jfield'
+    end
+
+    for jmethod_object in clazz:methods() do
+        -- see `jmethod'
+    end
+
+=head1 DESCRIPTION
+
+jclass is a representation of the java class object.
+
+TODO
+
+=head2 PROVIDED OBJECT
+
+jclass provides a L<prototype> object.
+
+=head2 PROVIDED FUNCTIONS
+
+=over 4
+
+=item B<jclass.parse_file(filename)>
+
+this method will create a new jclass object from file.
+
+=item B<jclass.for_name(canonical_name)>
+
+TODO
+
+=item B<jclass.classpath()>
+
+get current classpath string.
+
+=item B<jclass.classpath(classpath)>
+
+set new classpath string.
+
+=back
+
+=head2 PROVIDED METHODS
+
+=over 4
+
+=item B<jclass:package_name()>
+
+=item B<jclass:canonical_name()>
+
+=item B<jclass:simple_name()>
+
+=item B<jclass:classes()>
+
+=item B<jclass:declared_classes()>
+
+=item B<jclass:constructors()>
+
+=item B<jclass:declared_constructors()>
+
+=item B<jclass:fields()>
+
+=item B<jclass:declared_fields()>
+
+=item B<jclass:methods()>
+
+=item B<jclass:declared_methods()>
+
+=item B<jclass:annotations()>
+
+returns all annotations present on this class.
+this method will return a empty table if no annotations presented.
+
+=item B<jclass:declared_annotations()>
+
+=item B<jclass:component_type()>
+
+=item B<jclass:declaring_class()>
+
+=item B<jclass:enclosing_class()>
+
+=item B<jclass:enclosing_constructor()>
+
+=item B<jclass:enclosing_method()>
+
+=item B<jclass:enum_constants()>
+
+=item B<jclass:interfaces()>
+
+=item B<jclass:superclass()>
+
+=item B<jclass:type_parameters()>
+
+=item B<jclass:is_annotation()>
+
+=item B<jclass:is_anonymouse_class()>
+
+=item B<jclass:is_array()>
+
+=item B<jclass:is_assignable_from(jclass)>
+
+=item B<jclass:is_enum()>
+
+=item B<jclass:is_interface()>
+
+=item B<jclass:is_local_class()>
+
+=item B<jclass:is_member_class()>
+
+=item B<jclass:is_primitive()>
+
+=item B<jclass:is_synthetic()>
+
+=item B<jclass:is_public()>
+
+=item B<jclass:is_protected()>
+
+=item B<jclass:is_private()>
+
+=back
+
+=head1 AUTHOR
+
+kamichidu - L<c.kamunagi@gmail.com>
+
+=head1 LICENSE
+
+see LICENSE file.
+
+=cut
+--]]

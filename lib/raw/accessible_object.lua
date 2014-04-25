@@ -1,4 +1,5 @@
-local bitwise= require 'util.bitwise'
+local prototype= require 'prototype'
+local bitwise=   require 'util.bitwise'
 
 local access_flag= {
     public=     0x0001, -- Declared public; may be accessed from outside its package.
@@ -16,9 +17,11 @@ local access_flag= {
     enum=       0x4000, -- Declared as an enum type. 
 }
 
-local accessible_object= {}
+local accessible_object= prototype {
+    default= prototype.assignment_copy,
+}
 
-function accessible_object.new(flag)
+function accessible_object:new(flag)
     local obj= {}
 
     function obj.is_public()
