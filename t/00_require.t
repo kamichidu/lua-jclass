@@ -16,6 +16,7 @@ local modules= {
     'raw.method_info',
     'util.bitwise',
     'util.byte_reader',
+    'util.lookahead_queue',
     'util.parser',
     'util.youjo',
 }
