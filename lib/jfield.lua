@@ -1,7 +1,7 @@
-local prototype=         require 'prototype'
-local accessible_object= require 'raw.accessible_object'
-local parser=            require 'util.parser'
-local youjo=             require 'util.youjo'
+local prototype=    require 'prototype'
+local access_flags= require 'raw.access_flags'
+local parser=       require 'util.parser_factory'
+local youjo=        require 'util.youjo'
 
 local jfield= prototype {
     default= prototype.assignment_copy,
@@ -29,3 +29,44 @@ function jfield:new(constant_pools, field_info)
 end
 
 return jfield
+--[[
+=pod
+
+=head1 NAME
+
+jfield - java class or instance field representation.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head2 PROVIDED METHODS
+
+=over 4
+
+=item B<jfield:type()>
+
+=item B<jfield:name()>
+
+=item B<jfield:annotations()>
+
+=item B<jfield:declared_annotations()>
+
+=item B<jfield:declaring_class()>
+
+=item B<jfield:is_enum_constant()>
+
+=item B<jfield:is_synthetic()>
+
+=back
+
+=head1 AUTHOR
+
+kamichidu - <c.kamunagi@gmail.com>
+
+=head1 LICENSE
+
+see `LICENSE' file.
+
+=cut
+--]]

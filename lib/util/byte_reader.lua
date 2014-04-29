@@ -1,107 +1,136 @@
---[[!
--- @file
--- @brief binary based file reader
---]]
-local prototype= require 'prototype'
-local bitwise=   require 'util.bitwise'
+local prototype=       require 'prototype'
+local bitwise=         require 'util.bitwise'
+local lookahead_queue= require 'util.lookahead_queue'
 
 local byte_reader= prototype {
-    default= prototype.no_copy,
+    default= prototype.assignment_copy,
+    table=   prototype.deep_copy,
 }
 
----
--- @method byte_reader.new
--- @param filename {string} filename to be read
--- @return a object
-function byte_reader:new(filename)
-    local obj= {
-        _fh= io.open(filename, 'rb'),
-        _buffer= {},
-        _buf_size= 4 * 1024,
-    }
+-- associated file handle
+byte_reader.fh= nil
+-- buffer for read
+byte_reader.buffer= lookahead_queue:clone()
+-- buffer size
+byte_reader.bufsize= 4 * 1024
 
-    if not obj._fh then
-        error(string.format('file open failed: %s', filename))
+function byte_reader.open(filename)
+    local fh= io.open(filename, 'rb')
+
+    if not fh then
+        return nil
     end
 
-    -- http://stackoverflow.com/questions/16506683/in-lua-how-should-i-read-a-file-into-an-array-of-bytes
-    function obj.bytes(n)
-        if n == 0 then
-            return {}
-        end
+    local obj= byte_reader:clone()
 
-        local bytes= {}
-
-        if #(obj._buffer) > 0 then
-            while #(obj._buffer) > 0 do
-                bytes[#bytes + 1]= table.remove(obj._buffer, 1)
-
-                if #bytes == n then
-                    return bytes
-                end
-            end
-            for i, v in ipairs(obj.bytes(n - #bytes)) do
-                bytes[#bytes + 1]= v
-            end
-            return bytes
-        end
-
-        local buf= obj._fh:read(obj._buf_size)
-
-        for c in (buf or ''):gmatch('.') do
-            obj._buffer[#(obj._buffer) + 1]= c:byte()
-        end
-
-        if #(obj._buffer) > 0 then
-            return obj.bytes(n)
-        else
-            error(string.format('L41'))
-        end
-    end
-
-    function obj.int32()
-        local bytes= obj.bytes(4)
-
-        if not bytes or #bytes == 0 then
-            error(string.format('L49'))
-        end
-
-        return bitwise.bor(
-            bitwise.lshift(bytes[1], 24),
-            bitwise.lshift(bytes[2], 16),
-            bitwise.lshift(bytes[3], 8),
-            bitwise.lshift(bytes[4], 0)
-        )
-    end
-
-    function obj.int16()
-        local bytes= obj.bytes(2)
-
-        if not bytes or #bytes == 0 then
-            error(string.format('L64'))
-        end
-
-        return bitwise.bor(
-            bitwise.lshift(bytes[1], 8),
-            bitwise.lshift(bytes[2], 0)
-        )
-    end
-
-    function obj.int8()
-        local bytes= obj.bytes(1)
-
-        if not bytes or #bytes == 0 then
-            error(string.format('L77'))
-        end
-
-        return bytes[1]
-    end
-
-    function obj.close()
-        obj._fh:close()
-    end
+    obj.fh= fh
 
     return obj
 end
 
+function byte_reader:read(nbytes)
+    assert(nbytes > 0, 'expects positive integer')
+
+    -- consume buffer
+    if self.buffer:size() >= nbytes then
+        local bytes= {}
+
+        while #(bytes) < nbytes do
+            table.insert(bytes, self.buffer:poll())
+        end
+
+        return bytes
+    end
+
+    -- http://stackoverflow.com/questions/16506683/in-lua-how-should-i-read-a-file-into-an-array-of-bytes
+    local str= self.fh:read(self.bufsize)
+
+    assert(str, 'read failed')
+
+    for c in str:gmatch('.') do
+        self.buffer:push_back(c:byte())
+    end
+
+    return self:read(nbytes)
+end
+
+function byte_reader:read_int32()
+    local bytes= self:read(4)
+
+    assert(#(bytes) == 4, 'cannot read 4 bytes')
+
+    return bitwise.bor(
+        bitwise.lshift(bytes[1], 24),
+        bitwise.lshift(bytes[2], 16),
+        bitwise.lshift(bytes[3], 8),
+        bitwise.lshift(bytes[4], 0)
+    )
+end
+
+function byte_reader:read_int16()
+    local bytes= self:read(2)
+
+    assert(#(bytes) == 2, 'cannot read 2 bytes')
+
+    return bitwise.bor(
+        bitwise.lshift(bytes[1], 8),
+        bitwise.lshift(bytes[2], 0)
+    )
+end
+
+function byte_reader:read_int8()
+    local bytes= self:read(1)
+
+    assert(#(bytes) == 1, 'cannot read 1 bytes')
+
+    return bytes[1]
+end
+
+function byte_reader:close()
+    assert(self.fh)
+
+    self.fh:close()
+    self.fh= nil
+end
+
 return byte_reader
+--[[
+=pod
+
+=head1 NAME
+
+byte_reader - byte based file reader
+
+=head1 SYNOPSIS
+
+    local byte_reader= require 'util.byte_reader'
+
+    local reader= byte_reader.open('path/to/file')
+
+    print('read 1 byte', reader:read(1))
+    print('read 2 bytes', reader:read(2))
+    print('read 4 bytes', reader:read(4))
+
+=head1 DESCRIPTION
+
+=head2 PROVIDED FUNCTIONS
+
+=over 4
+
+=item B<byte_reader.open(filename)>
+
+=back
+
+=head2 PROVIDED METHODS
+
+=over 4
+
+=item B<reader:read(nbytes)>
+
+=item B<reader:close()>
+
+=back
+
+=cut
+--]]
+-- vim:fen:fdm=marker

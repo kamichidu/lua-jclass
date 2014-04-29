@@ -3,6 +3,7 @@ local prototype= require 'prototype'
 local lookahead_queue= prototype {
     default= prototype.assignment_copy,
     table=   prototype.deep_copy,
+    use_extra_meta= true,
 }
 
 lookahead_queue.elements= {}
@@ -13,7 +14,7 @@ function lookahead_queue.from_iterator(iterator)
     local obj= lookahead_queue:clone()
 
     for e in iterator do
-        obj.elements[#(obj.elements) + 1]= e
+        table.insert(obj.elements, e)
     end
 
     return obj
@@ -42,6 +43,26 @@ function lookahead_queue:lookahead(k)
 
     return self.elements[1 + k]
 end
+
+function lookahead_queue:push_back(...)
+    assert(#{...} > 0, 'no elements passed')
+
+    for i, element in ipairs({...}) do
+        table.insert(self.elements, element)
+    end
+end
+
+function lookahead_queue:size()
+    return #(self.elements)
+end
+
+local meta= getmetatable(lookahead_queue) or {}
+
+function meta.__len(op)
+    return 30
+end
+
+setmetatable(lookahead_queue, meta)
 
 return lookahead_queue
 --[[

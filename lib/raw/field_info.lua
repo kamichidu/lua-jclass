@@ -1,26 +1,45 @@
+local prototype= require 'prototype'
 local attribute_info= require 'raw.attribute_info'
 
-local field_info= {
+local field_info= prototype {
+    default=  prototype.assignment_copy,
+    table=    prototype.deep_copy,
+    userdata= prototype.clone_copy,
 }
 
-function field_info.new(reader)
-    local access_flags= reader.int16()
-    local name_index=   reader.int16()
-    local descriptor_index= reader.int16()
-    local attributes_count= reader.int16()
-    local attributes= {}
+field_info.attrs= {}
 
-    while #(attributes) < attributes_count do
-        attributes[#attributes + 1]= attribute_info.new(reader)
+function field_info.parse(reader)
+    local fi= field_info:clone()
+
+    fi:access_flags(reader)
+    fi:name_index(reader)
+    fi:descriptor_index(reader)
+    fi:attributes(reader)
+
+    return fi.attrs
+end
+
+function field_info:access_flags(reader)
+    self.attrs.access_flags= reader:read_int16()
+end
+
+function field_info:name_index(reader)
+    self.attrs.name_index= reader:read_int16()
+end
+
+function field_info:descriptor_index(reader)
+    self.attrs.descriptor_index= reader:read_int16()
+end
+
+function field_info:attributes(reader)
+    local count= reader:read_int16()
+
+    self.attrs.attributes= {}
+
+    while #(self.attrs.attributes) < count do
+        table.insert(self.attrs.attributes, attribute_info.parse(reader))
     end
-
-    return {
-        _access_flags=     access_flags,
-        _name_index=       name_index,
-        _descriptor_index= descriptor_index,
-        _attributes_count= attributes_count,
-        _attributes=       attributes,
-    }
 end
 
 return field_info

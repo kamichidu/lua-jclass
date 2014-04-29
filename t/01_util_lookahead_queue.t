@@ -26,4 +26,21 @@ subtest('from_string', function()
     is(q:lookahead(1), 'd')
 end)
 
+subtest('elements size', function()
+    local q= lookahead_queue:clone()
+
+    is(q:size() , 0 , 'size()')
+    -- is(#q       , 0 , '#{}')
+
+    q:push_back('a', 'b', 'c')
+
+    is(q:size() , 3 , 'size()')
+    -- is(#q       , 3 , '#{}')
+
+    q:poll()
+
+    is(q:size() , 2 , 'size()')
+    -- is(#q       , 2 , '#{}')
+end)
+
 done_testing()

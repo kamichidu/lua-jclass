@@ -1,7 +1,7 @@
-local prototype=         require 'prototype'
-local accessible_object= require 'raw.accessible_object'
-local parser=            require 'util.parser'
-local youjo=             require 'util.youjo'
+local prototype=    require 'prototype'
+local access_flags= require 'raw.access_flags'
+local parser=       require 'util.parser_factory'
+local youjo=        require 'util.youjo'
 
 local jmethod= prototype {
     default= prototype.assignment_copy,
@@ -34,3 +34,52 @@ function jmethod:new(constant_pools, method_info)
 end
 
 return jmethod
+--[[
+=pod
+
+=head1 NAME
+
+jmethod - java class or instance method representation.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head2 PROVIDED METHODS
+
+=over 4
+
+=item B<jmethod:name()>
+
+=item B<jmethod:declared_annotations()>
+
+=item B<jmethod:declaring_class()>
+
+=item B<jmethod:exception_types()>
+
+=item B<jmethod:parameter_types()>
+
+=item B<jmethod:return_type()>
+
+=item B<jmethod:type_parameters()>
+
+=item B<jmethod:is_bridge()>
+
+=item B<jmethod:is_synthetic()>
+
+=item B<jmethod:is_var_args()>
+
+default_value() XXX: annotation only
+
+=back
+
+=head1 AUTHOR
+
+kamichidu - <c.kamunagi@gmail.com>
+
+=head1 LICENSE
+
+see `LICENSE' file.
+
+=cut
+--]]

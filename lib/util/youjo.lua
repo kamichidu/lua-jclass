@@ -55,4 +55,23 @@ function youjo:decode_utf8(bytes)
     return utf8
 end
 
+function youjo:filter(unfiltered, predicate)
+    local filtered= {}
+
+    for i, e in ipairs(unfiltered) do
+        if predicate(e) then
+            table.insert(filtered, e)
+        end
+    end
+
+    return filtered
+end
+
+function youjo:make_iterator(list)
+    assert(list, 'got nil')
+
+    for i, v in ipairs(list) do
+    end
+end
+
 return youjo

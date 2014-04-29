@@ -1,21 +1,29 @@
-local attribute_info= {}
+local prototype= require 'prototype'
 
-function attribute_info.new(reader)
-    local attribute_name_index= reader.int16()
-    local attribute_length=     reader.int32()
-    local info= {}
+local attribute_info= prototype {
+    default= prototype.assignment_copy,
+    table=   prototype.deep_copy,
+}
 
-    while #(info) < attribute_length do
-        local size= #(info)
+attribute_info.attrs= {}
 
-        info[size + 1]= reader.int8()
-    end
+function attribute_info.parse(reader)
+    local ai= attribute_info:clone()
 
-    return {
-        _attribute_name_index= attribute_name_index,
-        _attribute_length=     attribute_length,
-        _info=                 info,
-    }
+    ai:attribute_name_index(reader)
+    ai:info(reader)
+
+    return ai.attrs
+end
+
+function attribute_info:attribute_name_index(reader)
+    self.attrs.attribute_name_index= reader:read_int16()
+end
+
+function attribute_info:info(reader)
+    local length= reader:read_int32()
+
+    self.attrs.info= reader:read(length)
 end
 
 return attribute_info

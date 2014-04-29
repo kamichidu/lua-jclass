@@ -1,85 +1,188 @@
-local prototype=         require 'prototype'
-local jfield=            require 'jfield'
-local jmethod=           require 'jmethod'
-local accessible_object= require 'raw.accessible_object'
-local class_file=        require 'raw.class_file'
-local bitwise=           require 'util.bitwise'
-local byte_reader=       require 'util.byte_reader'
-local parser=            require 'util.parser'
-local youjo=             require 'util.youjo'
+local prototype=    require 'prototype'
+local jfield=       require 'jfield'
+local jmethod=      require 'jmethod'
+local access_flags= require 'raw.access_flags'
+local class_file=   require 'raw.class_file'
+local byte_reader=  require 'util.byte_reader'
+local parser=       require 'util.parser_factory'
+local youjo=        require 'util.youjo'
 
 local jclass= prototype {
-    default= prototype.assignment_copy,
+    default=  prototype.assignment_copy,
+    table=    prototype.deep_copy,
+    userdata= prototype.clone_copy,
 }
 
+jclass.attrs= {}
+
 function jclass.parse_file(filename)
-    return self:new(byte_reader.new(filename))
+    local reader= byte_reader.open(filename)
+    local jc= jclass:clone()
+
+    jc.attrs.raw= class_file.parse(reader)
+
+    reader:close()
+
+    return jc
 end
 
-function jclass.for_name(reader)
-    local class_file= class_file.new(reader)
-
-    local obj= setmetatable({}, {__index= accessible_object:new(class_file._access_flags)})
-
-    function obj.version()
-        return tonumber(class_file._major_version .. '.' .. class_file._minor_version)
-    end
-
-    function obj.classname()
-        local class_info= class_file._constant_pools[class_file._this_class]
-        local name_info= class_file._constant_pools[class_info._name_index]
-
-        local s, c= youjo:decode_utf8(name_info._bytes):gsub('/', '.')
-
-        return s
-    end
-
-    function obj.super_classname()
-        local class_info= class_file._constant_pools[class_file._super_class]
-
-        if not class_info then
-            return nil
-        end
-
-        local name_info= class_file._constant_pools[class_info._name_index]
-
-        local s, c= youjo:decode_utf8(name_info._bytes):gsub('/', '.')
-
-        return s
-    end
-
-    function obj.super_class(path_resolver)
-        local class_info= class_file._constant_pools[class_file._super_class]
-        local name_info= class_file._constant_pools[class_info._name_index]
-        local relative_path= youjo:decode_utf8(name_info._bytes) .. '.class'
-
-        local path= path_resolver(relative_path)
-
-        return self:new(byte_reader.new(path))
-    end
-
-    function obj.fields()
-        local fields= {}
-
-        for i, field_info in ipairs(class_file._fields) do
-            fields[#fields + 1]= jfield:new(class_file._constant_pools, field_info)
-        end
-
-        return fields
-    end
-
-    function obj.methods()
-        local methods= {}
-
-        for i, method_info in ipairs(class_file._methods) do
-            methods[#methods + 1]= jmethod:new(class_file._constant_pools, method_info)
-        end
-
-        return methods
-    end
-
-    return obj
+function jclass.for_name(canonical_name)
+    -- TODO
 end
+
+function jclass.classpath(...)
+    local args= {...}
+
+    if #args then
+        jclass.attrs.classpath= args[1]
+    else
+        return jclass.attrs.classpath
+    end
+end
+
+function jclass:package_name()
+    local fully_name= self:canonical_name()
+
+    local parts= {}
+    for part in fully_name:gmatch('%w+') do
+        table.insert(parts, part)
+    end
+
+    if #parts > 1 then
+        return table.concat(parts, '.', 1, #parts - 1)
+    else
+        return parts[1]
+    end
+end
+
+function jclass:canonical_name()
+    local const_class= self:raw().constant_pools[self:raw().this_class]
+    local const_utf8= self:raw().constant_pools[const_class.name_index]
+
+    local name= youjo:decode_utf8(const_utf8.bytes)
+
+    return name:gsub('/', '.')
+end
+
+function jclass:simple_name()
+    return self:canonical_name():match('%w+$')
+end
+
+function jclass:classes()
+end
+
+function jclass:declared_classes()
+    local const_classes= youjo:filter(self:constant_pools(), function(cp_info)
+        return cp_info.kind == 'Class'
+    end)
+
+    local classes= {}
+
+    for i, const_class in ipairs(const_classes) do
+        local const_utf8= self:constant_pools()[const_class.name_index]
+
+        table.insert(classes, youjo:decode_utf8(const_utf8.bytes))
+    end
+
+    return youjo:make_iterator(classes)
+end
+
+function jclass:constructors()
+end
+
+function jclass:declared_constructors()
+end
+
+function jclass:fields()
+end
+
+function jclass:declared_fields()
+end
+
+function jclass:methods()
+end
+
+function jclass:declared_methods()
+end
+
+function jclass:annotations()
+end
+
+function jclass:declared_annotations()
+end
+
+function jclass:component_type()
+end
+
+function jclass:declaring_class()
+end
+
+function jclass:enclosing_class()
+end
+
+function jclass:enclosing_constructor()
+end
+
+function jclass:enclosing_method()
+end
+
+function jclass:enum_constants()
+end
+
+function jclass:interfaces()
+end
+
+function jclass:superclass()
+end
+
+function jclass:type_parameters()
+end
+
+function jclass:is_annotation()
+end
+
+function jclass:is_anonymouse_class()
+end
+
+function jclass:is_array()
+end
+
+function jclass:is_enum()
+end
+
+function jclass:is_interface()
+end
+
+function jclass:is_local_class()
+end
+
+function jclass:is_member_class()
+end
+
+function jclass:is_primitive()
+end
+
+function jclass:is_synthetic()
+end
+
+function jclass:is_public()
+end
+
+function jclass:is_protected()
+end
+
+function jclass:is_private()
+end
+
+-- utilities {{{
+function jclass:raw()
+    return self.attrs.raw or {}
+end
+
+function jclass:constant_pools()
+    return self:raw().constant_pools or {}
+end
+-- }}}
 
 return jclass
 
@@ -200,8 +303,6 @@ this method will return a empty table if no annotations presented.
 
 =item B<jclass:is_array()>
 
-=item B<jclass:is_assignable_from(jclass)>
-
 =item B<jclass:is_enum()>
 
 =item B<jclass:is_interface()>
@@ -232,3 +333,4 @@ see LICENSE file.
 
 =cut
 --]]
+-- vim: fen: fdm=marker
