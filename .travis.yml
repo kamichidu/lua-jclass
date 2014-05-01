@@ -33,6 +33,7 @@ before_install:
 
 install:
     - luarocks-$LUA_VER --local install lua-testmore
+    - luarocks-$LUA_VER --local install prototype
     - eval `luarocks-$LUA_VER path`
 
 script: prove --recurse --exec lua$LUA_SFX
