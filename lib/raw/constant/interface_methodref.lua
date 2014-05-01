@@ -10,7 +10,7 @@ function interface_methodref.new(tag, reader)
     local info= interface_methodref:clone()
 
     info.tag= tag
-    info.class_index= reader:reader:read_int16()
+    info.class_index=         reader:read_int16()
     info.name_and_type_index= reader:read_int16()
 
     return info
