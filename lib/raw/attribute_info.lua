@@ -10,9 +10,10 @@ function attribute_info.parse(constant_pools, reader)
     local const_utf8=           constant_pools[attribute_name_index]
     local attribute_name=       youjo:decode_utf8(const_utf8.bytes)
 
-    if attribute_name == 'InnerClasses' then return require('raw.attribute.inner_classes').new(constant_pools, reader) end
+    if attribute_name == 'InnerClasses'  then return require('raw.attribute.inner_classes').new(constant_pools, reader) end
     if attribute_name == 'ConstantValue' then return require('raw.attribute.constant_value').new(constant_pools, reader) end
-    if attribute_name == 'Code' then return require('raw.attribute.code').new(constant_pools, reader) end
+    if attribute_name == 'Code'          then return require('raw.attribute.code').new(constant_pools, reader) end
+    if attribute_name == 'Signature'     then return require('raw.attribute.signature').new(constant_pools, reader) end
 
     -- when no matched, consume bytes
     local length= reader:read_int32()
