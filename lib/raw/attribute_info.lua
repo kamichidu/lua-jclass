@@ -1,29 +1,29 @@
 local prototype= require 'prototype'
+local youjo=     require 'util.youjo'
 
 local attribute_info= prototype {
     default= prototype.assignment_copy,
-    table=   prototype.deep_copy,
 }
 
-attribute_info.attrs= {}
+function attribute_info.parse(constant_pools, reader)
+    local attribute_name_index= reader:read_int16()
+    local const_utf8=           constant_pools[attribute_name_index]
+    local attribute_name=       youjo:decode_utf8(const_utf8.bytes)
 
-function attribute_info.parse(reader)
-    local ai= attribute_info:clone()
+    if attribute_name == 'InnerClasses' then return require('raw.attribute.inner_classes').new(constant_pools, reader) end
+    if attribute_name == 'ConstantValue' then return require('raw.attribute.constant_value').new(constant_pools, reader) end
+    if attribute_name == 'Code' then return require('raw.attribute.code').new(constant_pools, reader) end
 
-    ai:attribute_name_index(reader)
-    ai:info(reader)
-
-    return ai.attrs
-end
-
-function attribute_info:attribute_name_index(reader)
-    self.attrs.attribute_name_index= reader:read_int16()
-end
-
-function attribute_info:info(reader)
+    -- when no matched, consume bytes
     local length= reader:read_int32()
+    local info= reader:read(length)
 
-    self.attrs.info= reader:read(length)
+    return {
+        kind= '<<unknown>>',
+        attribute_name_index= attribute_name_index,
+        attribute_length= length,
+        info= info,
+    }
 end
 
 return attribute_info

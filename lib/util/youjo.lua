@@ -19,9 +19,6 @@ end
 local function pretty_table(o)
     local buf= {}
 
-    -- for i, v in ipairs(o) do
-    --     buf[#buf + 1]= youjo.pretty(v)
-    -- end
     for k, v in pairs(o) do
         if type(k) == type(0) then
             buf[#buf + 1]= youjo.pretty(v)
@@ -35,11 +32,15 @@ end
 local function pretty_string(o)
     return '"' .. o .. '"'
 end
-function youjo:pretty(o)
+function youjo.pretty(o)
     if type(o) == type({}) then
         return pretty_table(o)
     elseif type(o) == type('') then
         return pretty_string(o)
+    elseif o == nil then
+        return 'nil'
+    elseif type(o) == 'function' then
+        return '<<function>>'
     else
         return '' .. o
     end
@@ -65,13 +66,6 @@ function youjo:filter(unfiltered, predicate)
     end
 
     return filtered
-end
-
-function youjo:make_iterator(list)
-    assert(list, 'got nil')
-
-    for i, v in ipairs(list) do
-    end
 end
 
 return youjo

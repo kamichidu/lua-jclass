@@ -28,6 +28,7 @@ end
 
 function jclass.for_name(canonical_name)
     -- TODO
+    return canonical_name
 end
 
 function jclass.classpath(...)
@@ -80,11 +81,13 @@ function jclass:declared_classes()
 
     for i, const_class in ipairs(const_classes) do
         local const_utf8= self:constant_pools()[const_class.name_index]
+        local resource_name= youjo:decode_utf8(const_utf8.bytes)
+        local classname= resource_name:gsub('[/$]', '.')
 
-        table.insert(classes, youjo:decode_utf8(const_utf8.bytes))
+        table.insert(classes, jclass.for_name(classname))
     end
 
-    return youjo:make_iterator(classes)
+    return classes
 end
 
 function jclass:constructors()

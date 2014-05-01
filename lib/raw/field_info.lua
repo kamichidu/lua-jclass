@@ -9,13 +9,13 @@ local field_info= prototype {
 
 field_info.attrs= {}
 
-function field_info.parse(reader)
+function field_info.parse(constant_pools, reader)
     local fi= field_info:clone()
 
     fi:access_flags(reader)
     fi:name_index(reader)
     fi:descriptor_index(reader)
-    fi:attributes(reader)
+    fi:attributes(constant_pools, reader)
 
     return fi.attrs
 end
@@ -32,13 +32,13 @@ function field_info:descriptor_index(reader)
     self.attrs.descriptor_index= reader:read_int16()
 end
 
-function field_info:attributes(reader)
+function field_info:attributes(constant_pools, reader)
     local count= reader:read_int16()
 
     self.attrs.attributes= {}
 
     while #(self.attrs.attributes) < count do
-        table.insert(self.attrs.attributes, attribute_info.parse(reader))
+        table.insert(self.attrs.attributes, attribute_info.parse(constant_pools, reader))
     end
 end
 

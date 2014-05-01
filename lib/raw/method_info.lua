@@ -9,13 +9,13 @@ local method_info= prototype {
 
 method_info.attrs= {}
 
-function method_info.parse(reader)
+function method_info.parse(constant_pools, reader)
     local mi= method_info:clone()
 
     mi:access_flags(reader)
     mi:name_index(reader)
     mi:descriptor_index(reader)
-    mi:attributes(reader)
+    mi:attributes(constant_pools, reader)
 
     return mi.attrs
 end
@@ -32,13 +32,13 @@ function method_info:descriptor_index(reader)
     self.attrs.descriptor_index= reader:read_int16()
 end
 
-function method_info:attributes(reader)
+function method_info:attributes(constant_pools, reader)
     local count= reader:read_int16()
 
     self.attrs.attributes= {}
 
     while #(self.attrs.attributes) < count do
-        table.insert(self.attrs.attributes, attribute_info.parse(reader))
+        table.insert(self.attrs.attributes, attribute_info.parse(constant_pools, reader))
     end
 end
 

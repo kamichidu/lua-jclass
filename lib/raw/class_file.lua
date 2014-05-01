@@ -93,7 +93,7 @@ function class_file:fields(reader)
     self.attrs.fields= {}
 
     while #(self.attrs.fields) < count do
-        table.insert(self.attrs.fields, field_info.parse(reader))
+        table.insert(self.attrs.fields, field_info.parse(self.attrs.constant_pools, reader))
     end
 end
 
@@ -103,7 +103,7 @@ function class_file:methods(reader)
     self.attrs.methods= {}
 
     while #(self.attrs.methods) < count do
-        table.insert(self.attrs.methods, method_info.parse(reader))
+        table.insert(self.attrs.methods, method_info.parse(self.attrs.constant_pools, reader))
     end
 end
 
@@ -113,7 +113,7 @@ function class_file:attributes(reader)
     self.attrs.attributes= {}
 
     while #(self.attrs.attributes) < count do
-        table.insert(self.attrs.attributes, attribute_info.parse(reader))
+        table.insert(self.attrs.attributes, attribute_info.parse(self.attrs.constant_pools, reader))
     end
 end
 

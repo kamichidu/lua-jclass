@@ -11,7 +11,7 @@ local jc= jclass.parse_file(arg[1])
 print('package', jc:package_name())
 print('class', jc:canonical_name())
 print('classes')
-for class in jc:declared_classes() do
+for i, class in ipairs(jc:declared_classes()) do
     print('', class)
     -- print('', class:canonical_name())
 end
