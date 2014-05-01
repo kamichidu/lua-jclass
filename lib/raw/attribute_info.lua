@@ -18,6 +18,7 @@ function attribute_info.parse(constant_pools, reader)
     if attribute_name == 'LocalVariableTable'     then return require('raw.attribute.local_variable_table').new(constant_pools, reader) end
     if attribute_name == 'LocalVariableTypeTable' then return require('raw.attribute.local_variable_type_table').new(constant_pools, reader) end
     if attribute_name == 'Deprecated'             then return require('raw.attribute.deprecated').new(constant_pools, reader) end
+    if attribute_name == 'EnclosingMethod'        then return require('raw.attribute.enclosing_method').new(constant_pools, reader) end
 
     -- when no matched, consume bytes
     local length= reader:read_int32()
