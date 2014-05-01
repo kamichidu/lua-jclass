@@ -11,7 +11,12 @@ function utf8.new(tag, reader)
 
     info.tag= tag
     info.length= reader:read_int16()
-    info.bytes= reader:read(info.length)
+
+    if info.length > 0 then
+        info.bytes= reader:read(info.length)
+    else
+        info.bytes= {}
+    end
 
     return info
 end
