@@ -5,7 +5,7 @@ local access_flags= require 'raw.access_flags'
 local class_file=   require 'raw.class_file'
 local byte_reader=  require 'util.byte_reader'
 local parser=       require 'util.parser_factory'
-local youjo=        require 'util.youjo'
+local utf8=         require 'util.utf8'
 local iterators=    require 'util.iterators'
 
 local jclass= prototype {
@@ -228,7 +228,7 @@ function jclass:index2string(idx)
     local const_utf8= self:constant_pools()[idx]
 
     if const_utf8 then
-        return youjo:decode_utf8(const_utf8.bytes)
+        return utf8.decode(const_utf8.bytes)
     else
         return nil
     end

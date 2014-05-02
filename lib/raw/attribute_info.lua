@@ -1,5 +1,5 @@
 local prototype= require 'prototype'
-local youjo=     require 'util.youjo'
+local utf8=      require 'util.utf8'
 
 local attribute_info= prototype {
     default= prototype.assignment_copy,
@@ -8,7 +8,7 @@ local attribute_info= prototype {
 function attribute_info.parse(constant_pools, reader)
     local attribute_name_index= reader:read_int16()
     local const_utf8=           constant_pools[attribute_name_index]
-    local attribute_name=       youjo:decode_utf8(const_utf8.bytes)
+    local attribute_name=       utf8.decode(const_utf8.bytes)
 
     if attribute_name == 'InnerClasses'           then return require('raw.attribute.inner_classes').new(constant_pools, reader) end
     if attribute_name == 'ConstantValue'          then return require('raw.attribute.constant_value').new(constant_pools, reader) end

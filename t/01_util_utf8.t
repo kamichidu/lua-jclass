@@ -4,7 +4,7 @@ package.path= './lib/?.lua;' .. package.path
 
 require 'Test.More'
 
-local youjo= require 'util.youjo'
+local utf8= require 'util.utf8'
 
 plan 'no_plan'
 
