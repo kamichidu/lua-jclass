@@ -48,16 +48,17 @@ function jclass.parse_file(filename)
 end
 
 function jclass.for_name(canonical_name)
+    -- TODO
     return jclass:clone()
 end
 
 function jclass.classpath(...)
-    local args= {...}
+    local classpaths= {...}
 
-    if #args then
-        jclass.attrs.classpath= args[1]
+    if #(classpaths) then
+        jclass.attrs.classpaths= classpaths
     else
-        return jclass.attrs.classpath
+        return jclass.attrs.classpaths
     end
 end
 
@@ -120,9 +121,18 @@ function jclass:declared_constructors()
 end
 
 function jclass:fields()
+    return iterators.filter(self:declared_fields(), function(input)
+        -- TODO
+        return true
+    end)
 end
 
 function jclass:declared_fields()
+    local fields= iterators.make_iterator(self:raw().fields)
+    local fields= iterators.transform(fields, function(input)
+        return self:index2string(input.name_index)
+    end)
+    return fields
 end
 
 function jclass:methods()
@@ -289,11 +299,11 @@ TODO
 
 =item B<jclass.classpath()>
 
-get current classpath string.
+get current classpath string of list.
 
-=item B<jclass.classpath(classpath)>
+=item B<jclass.classpath(classpaths)>
 
-set new classpath string.
+set new classpath string of list.
 
 =back
 
