@@ -20,7 +20,7 @@ end
 
 function bitwise.band(...)
     local args= {...}
-    local z= 0
+    local z= 0xffffffff
 
     for i, arg in ipairs(args) do
         z= bitwise.band2(z, arg)
@@ -46,7 +46,7 @@ end
 
 function bitwise.bor(...)
     local args= {...}
-    local z= 0
+    local z= 0x00000000
 
     for i, arg in ipairs(args) do
         z= bitwise.bor2(z, arg)
