@@ -6,6 +6,7 @@ local class_file=   require 'raw.class_file'
 local byte_reader=  require 'util.byte_reader'
 local parser=       require 'util.parser_factory'
 local youjo=        require 'util.youjo'
+local iterators=    require 'util.iterators'
 
 local jclass= prototype {
     default=  prototype.assignment_copy,
@@ -15,20 +16,39 @@ local jclass= prototype {
 
 jclass.attrs= {}
 
+jclass:mixin(access_flags,
+    'is_public',
+    'is_final',
+    'is_super',
+    'is_interface',
+    'is_abstract',
+    'is_synthetic',
+    'is_annotation',
+    'is_enum'
+)
+
 function jclass.parse_file(filename)
-    local reader= byte_reader.open(filename)
-    local jc= jclass:clone()
+    local jc
+    local reader
+    local ok, mes= pcall(function()
+        reader= byte_reader.open(filename)
+        jc= jclass:clone()
 
-    jc.attrs.raw= class_file.parse(reader)
+        jc.attrs.raw= class_file.parse(reader)
+    end)
+    if reader then
+        reader:close()
+    end
 
-    reader:close()
+    if not ok then
+        error(mes)
+    end
 
     return jc
 end
 
 function jclass.for_name(canonical_name)
-    -- TODO
-    return canonical_name
+    return jclass:clone()
 end
 
 function jclass.classpath(...)
@@ -57,12 +77,11 @@ function jclass:package_name()
 end
 
 function jclass:canonical_name()
-    local const_class= self:raw().constant_pools[self:raw().this_class]
-    local const_utf8= self:raw().constant_pools[const_class.name_index]
+    local const_class= self:constant_pools()[self:raw().this_class]
+    local name= self:index2string(const_class.name_index)
+    local canonical_name= name:gsub('[/$]', '.')
 
-    local name= youjo:decode_utf8(const_utf8.bytes)
-
-    return name:gsub('/', '.')
+    return canonical_name
 end
 
 function jclass:simple_name()
@@ -70,24 +89,28 @@ function jclass:simple_name()
 end
 
 function jclass:classes()
+    return iterators.filter(self:declared_classes(), function(input)
+        return input:is_public()
+    end)
 end
 
 function jclass:declared_classes()
-    local const_classes= youjo:filter(self:constant_pools(), function(cp_info)
-        return cp_info.kind == 'Class'
-    end)
+    local attr_inner_classes= iterators.find(
+        iterators.make_iterator(self:attributes()),
+        function(input)
+            return input.kind == 'InnerClass'
+        end
+    )
 
-    local classes= {}
+    return iterators.transform(
+        iterators.make_iterator(attr_inner_classes.classes),
+        function(input)
+            local resource_name= self:index2string(input.inner_name_index)
+            local classname= resource_name:gsub('[/$]', '.')
 
-    for i, const_class in ipairs(const_classes) do
-        local const_utf8= self:constant_pools()[const_class.name_index]
-        local resource_name= youjo:decode_utf8(const_utf8.bytes)
-        local classname= resource_name:gsub('[/$]', '.')
-
-        table.insert(classes, jclass.for_name(classname))
-    end
-
-    return classes
+            return jclass.for_name(classname)
+        end
+    )
 end
 
 function jclass:constructors()
@@ -103,9 +126,20 @@ function jclass:declared_fields()
 end
 
 function jclass:methods()
+    return iterators.filter(self:declared_methods(), function(input)
+        -- TODO
+        return true
+    end)
 end
 
 function jclass:declared_methods()
+    local methods= iterators.make_iterator(self:raw().methods)
+    local methods= iterators.transform(methods, function(input)
+        return self:index2string(input.name_index)
+    end)
+    return iterators.filter(methods, function(input)
+        return input ~= '<init>' and input ~= '<cinit>' and input ~= '<clinit>'
+    end)
 end
 
 function jclass:annotations()
@@ -184,6 +218,20 @@ end
 
 function jclass:constant_pools()
     return self:raw().constant_pools or {}
+end
+
+function jclass:attributes()
+    return self:raw().attributes or {}
+end
+
+function jclass:index2string(idx)
+    local const_utf8= self:constant_pools()[idx]
+
+    if const_utf8 then
+        return youjo:decode_utf8(const_utf8.bytes)
+    else
+        return nil
+    end
 end
 -- }}}
 

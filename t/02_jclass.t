@@ -16,8 +16,8 @@ subtest('class', function()
     is(jc:simple_name()    , 'Map'           , 'simple name')
 
     local classes= jc:declared_classes()
-    type_ok(classes, 'table')
-    for i, class in ipairs(classes) do
+    type_ok(classes, 'function')
+    for class in classes do
         print(class)
     end
 end)

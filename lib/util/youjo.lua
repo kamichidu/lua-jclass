@@ -4,48 +4,6 @@ local youjo= prototype {
     default= prototype.no_copy,
 }
 
-function youjo:say(message, ...)
-    print(message .. ': ' .. table.concat(... or {}, ', '))
-end
-
-function youjo:say_utf8(message, ...)
-    local s= ''
-    for i, b in ipairs(... or {}) do
-        s= s .. string.char(b)
-    end
-    print(message .. ': ' .. s)
-end
-
-local function pretty_table(o)
-    local buf= {}
-
-    for k, v in pairs(o) do
-        if type(k) == type(0) then
-            buf[#buf + 1]= youjo.pretty(v)
-        else
-            buf[#buf + 1]= k .. '=' .. youjo.pretty(v)
-        end
-    end
-
-    return "{" .. table.concat(buf, ", ") .. "}"
-end
-local function pretty_string(o)
-    return '"' .. o .. '"'
-end
-function youjo.pretty(o)
-    if type(o) == type({}) then
-        return pretty_table(o)
-    elseif type(o) == type('') then
-        return pretty_string(o)
-    elseif o == nil then
-        return 'nil'
-    elseif type(o) == 'function' then
-        return '<<function>>'
-    else
-        return '' .. o
-    end
-end
-
 function youjo:decode_utf8(bytes)
     local utf8= ''
 
@@ -54,18 +12,6 @@ function youjo:decode_utf8(bytes)
     end
 
     return utf8
-end
-
-function youjo:filter(unfiltered, predicate)
-    local filtered= {}
-
-    for i, e in ipairs(unfiltered) do
-        if predicate(e) then
-            table.insert(filtered, e)
-        end
-    end
-
-    return filtered
 end
 
 return youjo
