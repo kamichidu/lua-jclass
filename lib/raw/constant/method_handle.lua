@@ -10,7 +10,7 @@ function method_handle.new(tag, reader)
     local info= method_handle:clone()
 
     info.tag= tag
-    info.reference_kind= reader:reader:read_int8()
+    info.reference_kind=  reader:read_int8()
     info.reference_index= reader:read_int16()
 
     return info
