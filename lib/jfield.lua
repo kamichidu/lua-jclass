@@ -8,24 +8,61 @@ local jfield= prototype {
     table=   prototype.deep_copy,
 }
 
-function jfield:new(constant_pools, field_info)
-    local descriptor_info= constant_pools[field_info._descriptor_index]
-    local descriptor= parser:parse_field_descriptor(utf8.decode(descriptor_info._bytes))
+jfield.attrs= {}
 
-    local obj= setmetatable({}, {__index= accessible_object.new(field_info._access_flags)})
+function jfield.new(constant_pools, field_info)
+    assert(constant_pools, 'ensure non-nil')
+    assert(field_info, 'ensure non-nil')
 
-    function obj.name()
-        local name_info= constant_pools[field_info._name_index]
-        local s, c= utf8.decode(name_info._bytes)
+    local obj= jfield:clone()
 
-        return s
-    end
+    obj.attrs.constant_pools= constant_pools
+    obj.attrs.field_info=     field_info
 
-    function obj.type()
-        return descriptor.type
-    end
+    local flags= access_flags:clone()
 
-    return obj
+    flags.access_flags= field_info.access_flags
+
+    return obj:mixin(flags,
+        'is_public',
+        'is_private',
+        'is_protected',
+        'is_static',
+        'is_final',
+        'is_volatile',
+        'is_transient',
+        'is_synthetic',
+        'is_enum'
+    )
+end
+
+function jfield:type()
+    local fdparser= parser.for_field_descriptor()
+
+    local descriptor_info= self:constant_pools()[self:field_info().descriptor_index]
+    local descriptor= fdparser:parse(utf8.decode(descriptor_info.bytes))
+
+    return descriptor.type
+end
+
+function jfield:name()
+    local const_utf8= self:constant_pools()[self:field_info().name_index]
+
+    return utf8.decode(const_utf8.bytes)
+end
+
+function jfield:annotations()
+end
+
+function jfield:declaring_class()
+end
+
+function jfield:constant_pools()
+    return self.attrs.constant_pools
+end
+
+function jfield:field_info()
+    return self.attrs.field_info
 end
 
 return jfield
@@ -49,8 +86,6 @@ jfield - java class or instance field representation.
 =item B<jfield:name()>
 
 =item B<jfield:annotations()>
-
-=item B<jfield:declared_annotations()>
 
 =item B<jfield:declaring_class()>
 

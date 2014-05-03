@@ -16,25 +16,29 @@ local jclass= prototype {
 
 jclass.attrs= {}
 
-jclass:mixin(access_flags,
-    'is_public',
-    'is_final',
-    'is_super',
-    'is_interface',
-    'is_abstract',
-    'is_synthetic',
-    'is_annotation',
-    'is_enum'
-)
-
 function jclass.parse_file(filename)
-    local jc
     local reader
-    local ok, mes= pcall(function()
+    local ok, jc= pcall(function()
         reader= byte_reader.open(filename)
-        jc= jclass:clone()
+
+        local jc= jclass:clone()
 
         jc.attrs.raw= class_file.parse(reader)
+
+        local flags= access_flags:clone()
+
+        flags.access_flags= jc.attrs.raw.access_flags
+
+        return jc:mixin(flags,
+            'is_public',
+            'is_final',
+            'is_super',
+            'is_interface',
+            'is_abstract',
+            'is_synthetic',
+            'is_annotation',
+            'is_enum'
+        )
     end)
     if reader then
         reader:close()
@@ -122,33 +126,32 @@ end
 
 function jclass:fields()
     return iterators.filter(self:declared_fields(), function(input)
-        -- TODO
-        return true
+        -- return input:is_public()
+        return input:is_private()
     end)
 end
 
 function jclass:declared_fields()
     local fields= iterators.make_iterator(self:raw().fields)
     local fields= iterators.transform(fields, function(input)
-        return self:index2string(input.name_index)
+        return jfield.new(self:constant_pools(), input)
     end)
     return fields
 end
 
 function jclass:methods()
     return iterators.filter(self:declared_methods(), function(input)
-        -- TODO
-        return true
+        return input:is_public()
     end)
 end
 
 function jclass:declared_methods()
     local methods= iterators.make_iterator(self:raw().methods)
     local methods= iterators.transform(methods, function(input)
-        return self:index2string(input.name_index)
+        return jmethod.new(self:constant_pools(), input)
     end)
     return iterators.filter(methods, function(input)
-        return input ~= '<init>' and input ~= '<cinit>' and input ~= '<clinit>'
+        return input:name() ~= '<init>' and input:name() ~= '<cinit>' and input:name() ~= '<clinit>'
     end)
 end
 

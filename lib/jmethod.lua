@@ -8,29 +8,82 @@ local jmethod= prototype {
     table=   prototype.deep_copy,
 }
 
-function jmethod:new(constant_pools, method_info)
-    -- descriptor_info must be utf8_info
-    local descriptor_info= constant_pools[method_info._descriptor_index]
-    local descriptor= parser:parse_method_descriptor(utf8.decode(descriptor_info._bytes))
+jmethod.attrs= {}
 
-    local obj= setmetatable({}, {__index= accessible_object.new(method_info._access_flags)})
+function jmethod.new(constant_pools, method_info)
+    local obj= jmethod:clone()
 
-    function obj.name()
-        local name_info= constant_pools[method_info._name_index]
-        local s, c= utf8.decode(name_info._bytes)
+    obj.attrs.constant_pools= constant_pools
+    obj.attrs.method_info=    method_info
 
-        return s
-    end
+    local af= access_flags:clone()
 
-    function obj.return_type()
-        return descriptor.return_type
-    end
+    af.access_flags= method_info.access_flags
 
-    function obj.parameter_types()
-        return descriptor.parameter_types
-    end
+    return obj:mixin(af,
+        'is_public',
+        'is_private',
+        'is_protected',
+        'is_static',
+        'is_final',
+        'is_synchronized',
+        'is_bridge',
+        'is_varargs',
+        'is_native',
+        'is_abstract',
+        'is_strict',
+        'is_synthetic'
+    )
+end
 
-    return obj
+function jmethod:name()
+    local const_utf8= self:constant_pools()[self:method_info().name_index]
+
+    return utf8.decode(const_utf8.bytes)
+end
+
+function jmethod:annotations()
+end
+
+function jmethod:declaring_class()
+end
+
+function jmethod:exception_types()
+end
+
+function jmethod:parameter_types()
+    local mdparser= parser.for_method_descriptor()
+
+    local descriptor_info= self:constant_pools()[self:method_info().descriptor_index]
+    local descriptor= mdparser:parse(utf8.decode(descriptor_info.bytes))
+
+    return descriptor.parameter_types
+end
+
+function jmethod:return_type()
+    local mdparser= parser.for_method_descriptor()
+
+    local descriptor_info= self:constant_pools()[self:method_info().descriptor_index]
+    local descriptor= mdparser:parse(utf8.decode(descriptor_info.bytes))
+
+    return descriptor.return_type
+end
+
+function jmethod:type_parameters()
+end
+
+function jmethod:is_bridge()
+end
+
+function jmethod:is_var_args()
+end
+
+function jmethod:constant_pools()
+    return self.attrs.constant_pools
+end
+
+function jmethod:method_info()
+    return self.attrs.method_info
 end
 
 return jmethod
@@ -51,7 +104,7 @@ jmethod - java class or instance method representation.
 
 =item B<jmethod:name()>
 
-=item B<jmethod:declared_annotations()>
+=item B<jmethod:annotations()>
 
 =item B<jmethod:declaring_class()>
 
@@ -64,8 +117,6 @@ jmethod - java class or instance method representation.
 =item B<jmethod:type_parameters()>
 
 =item B<jmethod:is_bridge()>
-
-=item B<jmethod:is_synthetic()>
 
 =item B<jmethod:is_var_args()>
 

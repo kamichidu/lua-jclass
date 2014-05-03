@@ -21,6 +21,8 @@ local access_flags= prototype {
     default= prototype.assignment_copy,
 }
 
+access_flags.access_flags= 0x0000
+
 function access_flags:is_public()
     return bitwise.band(self.access_flags, constants.public) == constants.public
 end
