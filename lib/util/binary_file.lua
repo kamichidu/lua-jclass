@@ -5,8 +5,26 @@ local binary_file= prototype {
     default= prototype.assignment_copy,
 }
 
+function binary_file.big_endian(bytes)
+    local shifts= 8 * (#(bytes) - 1)
+    local bits=   0x00000000
+
+    for _, byte in ipairs(bytes) do
+        bits= bitwise.bor(bits, bitwise.lshift(byte, shifts))
+
+        shifts= shifts - 8
+    end
+
+    return bits
+end
+
+function binary_file.little_endian(bytes)
+end
+
 -- associated file handle
 binary_file.fh= nil
+-- endian
+binary_file.endian= binary_file.big_endian
 
 function binary_file.open(filename)
     local fh, err= io.open(filename, 'rb')
@@ -49,15 +67,13 @@ function binary_file:read(...)
 
         local s= self.fh:read(nbytes)
         local shiftbits= 8 * (nbytes - 1)
-        local read= 0x00000000
+        local bytes= {}
 
         for c in s:gmatch('.') do
-            read= bitwise.bor(read, bitwise.lshift(c:byte(), shiftbits))
-
-            shiftbits= shiftbits - 8
+            table.insert(bytes, c:byte())
         end
 
-        return read
+        return self.endian(bytes)
     elseif type(fmt) == 'number' then
         local s= self.fh:read(fmt)
         local bytes= {}
