@@ -4,11 +4,11 @@ local signature= attribute_info:clone()
 
 signature.kind= 'Signature'
 
-function signature.new(constant_pools, reader)
+function signature.new(constant_pools, file)
     local info= signature:clone()
 
-    info.attribute_length= reader:read_int32()
-    info.signature_index=  reader:read_int16()
+    info.attribute_length= file:read('u4')
+    info.signature_index=  file:read('u2')
 
     assert(info.attribute_length == 2, 'Signature_attribute.attribute_length must be 2')
 

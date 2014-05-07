@@ -4,14 +4,14 @@ local double= cp_info:clone()
 
 double.kind= 'Double'
 
-function double.new(tag, reader)
+function double.new(tag, file)
     assert(tag == 6, 'illegal argument')
 
     local info= double:clone()
 
-    info.tag= tag
-    info.high_bytes= reader:read_int32()
-    info.low_bytes= reader:read_int32()
+    info.tag=        tag
+    info.high_bytes= file:read('u4')
+    info.low_bytes=  file:read('u4')
 
     return info
 end

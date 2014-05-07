@@ -4,19 +4,14 @@ local utf8= cp_info:clone()
 
 utf8.kind= 'Utf8'
 
-function utf8.new(tag, reader)
+function utf8.new(tag, file)
     assert(tag == 1, 'illegal argument')
 
     local info= utf8:clone()
 
-    info.tag= tag
-    info.length= reader:read_int16()
-
-    if info.length > 0 then
-        info.bytes= reader:read(info.length)
-    else
-        info.bytes= {}
-    end
+    info.tag=    tag
+    info.length= file:read('u2')
+    info.bytes=  file:read(info.length)
 
     return info
 end

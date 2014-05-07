@@ -3,7 +3,7 @@ local jfield=       require 'jfield'
 local jmethod=      require 'jmethod'
 local access_flags= require 'raw.access_flags'
 local class_file=   require 'raw.class_file'
-local byte_reader=  require 'util.byte_reader'
+local binary_file=  require 'util.binary_file'
 local parser=       require 'util.parser_factory'
 local utf8=         require 'util.utf8'
 local iterators=    require 'util.iterators'
@@ -17,38 +17,48 @@ local jclass= prototype {
 jclass.attrs= {}
 
 function jclass.parse_file(filename)
-    local reader
-    local ok, jc= pcall(function()
-        reader= byte_reader.open(filename)
+    local file
+    local ok, ret= pcall(function()
+        local err
 
-        local jc= jclass:clone()
+        file, err= binary_file.open(filename)
 
-        jc.attrs.raw= class_file.parse(reader)
+        if not file then
+            error(err)
+        end
 
-        local flags= access_flags:clone()
-
-        flags.access_flags= jc.attrs.raw.access_flags
-
-        return jc:mixin(flags,
-            'is_public',
-            'is_final',
-            'is_super',
-            'is_interface',
-            'is_abstract',
-            'is_synthetic',
-            'is_annotation',
-            'is_enum'
-        )
+        return jclass.parse(file)
     end)
-    if reader then
-        reader:close()
+    if file then
+        file:close()
     end
 
     if not ok then
-        error(mes)
+        error(ret)
     end
 
-    return jc
+    return ret
+end
+
+function jclass.parse(file)
+    local jc= jclass:clone()
+
+    jc.attrs.raw= class_file.parse(file)
+
+    local flags= access_flags:clone()
+
+    flags.access_flags= jc.attrs.raw.access_flags
+
+    return jc:mixin(flags,
+        'is_public',
+        'is_final',
+        'is_super',
+        'is_interface',
+        'is_abstract',
+        'is_synthetic',
+        'is_annotation',
+        'is_enum'
+    )
 end
 
 function jclass.for_name(canonical_name)

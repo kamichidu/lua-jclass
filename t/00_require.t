@@ -39,7 +39,7 @@ local modules= {
     'raw.field_info',
     'raw.method_info',
     'util.bitwise',
-    'util.byte_reader',
+    'util.binary_file',
     'util.iterators',
     'util.lookahead_queue',
     'util.parser.class_type_signature',

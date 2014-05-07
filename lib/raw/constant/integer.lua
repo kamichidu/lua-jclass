@@ -4,13 +4,13 @@ local integer= cp_info:clone()
 
 integer.kind= 'Integer'
 
-function integer.new(tag, reader)
+function integer.new(tag, file)
     assert(tag == 3, 'illegal argument')
 
     local info= integer:clone()
 
-    info.tag= tag
-    info.bytes= reader:read_int32()
+    info.tag=   tag
+    info.bytes= file:read('u4')
 
     return info
 end

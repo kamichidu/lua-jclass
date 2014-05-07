@@ -4,11 +4,11 @@ local constant_value= attribute_info:clone()
 
 constant_value.kind= 'ConstantValue'
 
-function constant_value.new(constant_pools, reader)
+function constant_value.new(constant_pools, file)
     local info= constant_value:clone()
 
-    info.attribute_length= reader:read_int32()
-    info.constantvalue_index= reader:read_int16()
+    info.attribute_length=    file:read('u4')
+    info.constantvalue_index= file:read('u2')
 
     assert(info.attribute_length == 2)
 

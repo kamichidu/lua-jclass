@@ -9,36 +9,36 @@ local field_info= prototype {
 
 field_info.attrs= {}
 
-function field_info.parse(constant_pools, reader)
+function field_info.parse(constant_pools, file)
     local fi= field_info:clone()
 
-    fi:access_flags(reader)
-    fi:name_index(reader)
-    fi:descriptor_index(reader)
-    fi:attributes(constant_pools, reader)
+    fi:access_flags(file)
+    fi:name_index(file)
+    fi:descriptor_index(file)
+    fi:attributes(constant_pools, file)
 
     return fi.attrs
 end
 
-function field_info:access_flags(reader)
-    self.attrs.access_flags= reader:read_int16()
+function field_info:access_flags(file)
+    self.attrs.access_flags= file:read('u2')
 end
 
-function field_info:name_index(reader)
-    self.attrs.name_index= reader:read_int16()
+function field_info:name_index(file)
+    self.attrs.name_index= file:read('u2')
 end
 
-function field_info:descriptor_index(reader)
-    self.attrs.descriptor_index= reader:read_int16()
+function field_info:descriptor_index(file)
+    self.attrs.descriptor_index= file:read('u2')
 end
 
-function field_info:attributes(constant_pools, reader)
-    local count= reader:read_int16()
+function field_info:attributes(constant_pools, file)
+    local count= file:read('u2')
 
     self.attrs.attributes= {}
 
     while #(self.attrs.attributes) < count do
-        table.insert(self.attrs.attributes, attribute_info.parse(constant_pools, reader))
+        table.insert(self.attrs.attributes, attribute_info.parse(constant_pools, file))
     end
 end
 

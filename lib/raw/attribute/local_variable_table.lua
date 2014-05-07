@@ -4,21 +4,21 @@ local local_variable_table= attribute_info:clone()
 
 local_variable_table.kind= 'LocalVariableTable'
 
-function local_variable_table.new(constant_pools, reader)
+function local_variable_table.new(constant_pools, file)
     local info= local_variable_table:clone()
 
-    info.attribute_length=            reader:read_int32()
-    info.local_variable_table_length= reader:read_int16()
+    info.attribute_length=            file:read('u4')
+    info.local_variable_table_length= file:read('u2')
 
     info.local_variable_table= {}
 
     while #(info.local_variable_table) < info.local_variable_table_length do
         table.insert(info.local_variable_table, {
-            start_pc=         reader:read_int16(),
-            length=           reader:read_int16(),
-            name_index=       reader:read_int16(),
-            descriptor_index= reader:read_int16(),
-            index=            reader:read_int16(),
+            start_pc=         file:read('u2'),
+            length=           file:read('u2'),
+            name_index=       file:read('u2'),
+            descriptor_index= file:read('u2'),
+            index=            file:read('u2'),
         })
     end
 

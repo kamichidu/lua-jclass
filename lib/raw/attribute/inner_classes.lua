@@ -4,20 +4,20 @@ local inner_classes= attribute_info:clone()
 
 inner_classes.kind= 'InnerClass'
 
-function inner_classes.new(constant_pools, reader)
+function inner_classes.new(constant_pools, file)
     local info= inner_classes:clone()
 
-    info.attribute_length= reader:read_int32()
-    info.number_of_classes= reader:read_int16()
+    info.attribute_length=  file:read('u4')
+    info.number_of_classes= file:read('u2')
 
     info.classes= {}
 
     while #(info.classes) < info.number_of_classes do
         table.insert(info.classes, {
-            inner_class_info_index=   reader:read_int16(),
-            outer_class_info_index=   reader:read_int16(),
-            inner_name_index=         reader:read_int16(),
-            inner_class_access_flags= reader:read_int16(),
+            inner_class_info_index=   file:read('u2'),
+            outer_class_info_index=   file:read('u2'),
+            inner_name_index=         file:read('u2'),
+            inner_class_access_flags= file:read('u2'),
         })
     end
 

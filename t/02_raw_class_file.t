@@ -5,17 +5,17 @@ package.path= './lib/?.lua;' .. package.path
 require 'Test.More'
 
 local class_file=  require 'raw.class_file'
-local byte_reader= require 'util.byte_reader'
+local binary_file= require 'util.binary_file'
 
 plan 'no_plan'
 
 subtest('parse A.class', function()
-    local reader= byte_reader.open('t/fixture/A.class')
-    local cf= class_file.parse(reader)
+    local file= binary_file.open('t/fixture/A.class')
+    local cf= class_file.parse(file)
 
     ok(cf, 'can parse')
 
-    reader:close()
+    file:close()
 end)
 
 done_testing()
