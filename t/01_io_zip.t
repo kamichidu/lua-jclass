@@ -9,11 +9,9 @@ local zip= require 'io.zip'
 plan 'no_plan'
 
 subtest('basic', function()
-    local zfile, err= zip.open('./t/fixture/pack-only.jar')
+    local zfile= zip.open('./t/fixture/pack-only.jar')
 
-    if not zfile then
-        fail(err)
-    end
+    ok(zfile, 'open')
 end)
 
 done_testing()

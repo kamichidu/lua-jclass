@@ -19,6 +19,16 @@ function binary_file.big_endian(bytes)
 end
 
 function binary_file.little_endian(bytes)
+    local shifts= 0
+    local bits=   0x00000000
+
+    for _, byte in ipairs(bytes) do
+        bits= bitwise.bor(bits, bitwise.lshift(byte, shifts))
+
+        shifts= shifts + 8
+    end
+
+    return bits
 end
 
 -- associated file handle
@@ -75,7 +85,7 @@ function binary_file:read(...)
 
         return self.endian(bytes)
     elseif type(fmt) == 'number' then
-        local s= self.fh:read(fmt)
+        local s= self.fh:read(fmt) or ''
         local bytes= {}
 
         for c in s:gmatch('.') do
@@ -93,7 +103,7 @@ function binary_file:close()
 end
 
 function binary_file:seek(whence, offset)
-    self.fh:seek(whence, offset)
+    return self.fh:seek(whence, offset)
 end
 
 return binary_file
