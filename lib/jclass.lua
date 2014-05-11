@@ -129,9 +129,19 @@ function jclass:declared_classes()
 end
 
 function jclass:constructors()
+    return iterators.filter(self:declared_constructors(), function(input)
+        return input:is_public()
+    end)
 end
 
 function jclass:declared_constructors()
+    local methods= iterators.make_iterator(self:raw().methods)
+    local methods= iterators.transform(methods, function(input)
+        return jmethod.new(self:constant_pools(), input)
+    end)
+    return iterators.filter(methods, function(input)
+        return input:name() == '<init>' or input:name() == '<cinit>' or input:name() == '<clinit>'
+    end)
 end
 
 function jclass:fields()
