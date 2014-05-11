@@ -59,7 +59,7 @@ function binary_file:read(...)
 
         return read
     elseif type(fmt) == 'number' then
-        local s= self.fh:read(fmt)
+        local s= '' .. self.fh:read(fmt)
         local bytes= {}
 
         for c in s:gmatch('.') do
