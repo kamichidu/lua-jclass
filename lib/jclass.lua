@@ -69,7 +69,7 @@ end
 function jclass.classpath(...)
     local classpaths= {...}
 
-    if #(classpaths) then
+    if #(classpaths) > 0 then
         jclass.attrs.classpaths= classpaths
     else
         return jclass.attrs.classpaths
