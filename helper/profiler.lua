@@ -156,6 +156,7 @@ function profiler.reporter.tsv(prof_info)
 end
 -- }}}
 
+return profiler
 --[[
 =pod
 
