@@ -117,10 +117,14 @@ function jclass:declared_classes()
         end
     )
 
-    return iterators.transform(
-        iterators.make_iterator(attr_inner_classes.classes),
-        function(input)
-            local resource_name= self:index2string(input.inner_name_index)
+    if not attr_inner_classes then
+        return iterators.make_iterator({})
+    end
+
+    local classes= iterators.make_iterator(attr_inner_classes.classes)
+    return iterators.transform(classes, function(input)
+            local class_info= self:constant_pools()[input.inner_class_info_index]
+            local resource_name= self:index2string(class_info.name_index)
             local classname= resource_name:gsub('[/$]', '.')
 
             return jclass.for_name(classname)
