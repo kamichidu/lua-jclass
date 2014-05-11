@@ -99,7 +99,7 @@ function jclass.classpath(...)
     if #(classpaths) > 0 then
         jclass.attrs.classpaths= classpaths
     else
-        return jclass.attrs.classpaths
+        return jclass.attrs.classpaths or {}
     end
 end
 
