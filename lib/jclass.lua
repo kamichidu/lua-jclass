@@ -62,8 +62,35 @@ function jclass.parse(file)
 end
 
 function jclass.for_name(canonical_name)
-    -- TODO
-    return jclass:clone()
+    local zip= require 'zip'
+
+    for _, classpath in ipairs(jclass.classpath()) do
+        local ok, file= pcall(function()
+            return zip.open(classpath)
+        end)
+
+        if ok and file then
+            local classfile= jclass.open_inside(file, canonical_name)
+
+            if classfile then
+                local ok, ret= pcall(function()
+                    return jclass.parse(classfile)
+                end)
+
+                classfile:close()
+
+                if not ok then
+                    error(ret)
+                end
+
+                return ret
+            end
+
+            file:close()
+        end
+    end
+
+    return nil
 end
 
 function jclass.classpath(...)
@@ -266,6 +293,26 @@ function jclass:index2string(idx)
 
     if const_utf8 then
         return utf8.decode(const_utf8.bytes)
+    else
+        return nil
+    end
+end
+
+function jclass.open_inside(jarfile, classname)
+    local filename= classname:gsub('%.', '/') .. '.class'
+
+    local file= jarfile:open(filename)
+
+    if file then
+        local bfile= binary_file:clone()
+
+        bfile.fh= file
+
+        return bfile
+    end
+
+    if classname:find('%.') then
+        return jclass.open_inside(jarfile, classname:gsub('%.([a-zA-Z0-9$_]+)$', '$%1'))
     else
         return nil
     end
