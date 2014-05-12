@@ -4,9 +4,9 @@ env:
   global:
     - LUAROCKS_BASE=luarocks-2.1.2
   matrix:
-    - LUA=lua5.1 LUA_DEV=liblua5.1-dev     LUA_VER=5.1 LUA_SFX=5.1 LUA_INCDIR=/usr/include/lua5.1
-    - LUA=lua5.2 LUA_DEV=liblua5.2-dev     LUA_VER=5.2 LUA_SFX=5.2 LUA_INCDIR=/usr/include/lua5.2
-    - LUA=luajit LUA_DEV=libluajit-5.1-dev LUA_VER=5.1 LUA_SFX=jit LUA_INCDIR=/usr/include/luajit-2.0
+    - LUA=lua5.1 LUA_DEV=liblua5.1-dev     LUA_VER=5.1 LUA_SFX=5.1 LUA_INCDIR=/usr/include/lua5.1     LUAZIP_ROCKSPEC=luazip
+    - LUA=lua5.2 LUA_DEV=liblua5.2-dev     LUA_VER=5.2 LUA_SFX=5.2 LUA_INCDIR=/usr/include/lua5.2     LUAZIP_ROCKSPEC=https://raw.githubusercontent.com/tomasguisasola/luazip/master/rockspec/luazip-1.3.0-1.rockspec
+    - LUA=luajit LUA_DEV=libluajit-5.1-dev LUA_VER=5.1 LUA_SFX=jit LUA_INCDIR=/usr/include/luajit-2.0 LUAZIP_ROCKSPEC=luazip
 
 # branches:
 #   only:
@@ -33,6 +33,7 @@ before_install:
 install:
     - luarocks-$LUA_VER --local install lua-testmore
     - luarocks-$LUA_VER --local install prototype
+    - luarocks-$LUA_VER --local install $LUAZIP_ROCKSPEC
     - eval `luarocks-$LUA_VER path`
 
 script: prove --recurse --exec lua$LUA_SFX
