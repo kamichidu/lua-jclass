@@ -94,9 +94,23 @@ function jclass.for_name(canonical_name)
 end
 
 function jclass.classpath(...)
-    local classpaths= {...}
+    local arguments= {...}
 
-    if #(classpaths) > 0 then
+    if #(arguments) > 0 then
+        local classpaths= {}
+
+        local append
+        append= function(container, elements)
+            for _, classpath in ipairs(elements) do
+                if type(classpath) == 'string' then
+                    table.insert(classpaths, classpath)
+                elseif type(classpath) == 'table' then
+                    append(container, classpath)
+                end
+            end
+        end
+        append(classpaths, arguments)
+
         jclass.attrs.classpaths= classpaths
     else
         return jclass.attrs.classpaths or {}
