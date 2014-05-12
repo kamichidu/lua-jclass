@@ -93,28 +93,31 @@ function jclass.for_name(canonical_name)
     return nil
 end
 
-function jclass.classpath(...)
-    local arguments= {...}
+-- TODO: modulize
+local function flatten(list)
+    local flat= {}
 
-    if #(arguments) > 0 then
-        local classpaths= {}
-
-        local append
-        append= function(container, elements)
-            for _, classpath in ipairs(elements) do
-                if type(classpath) == 'string' then
-                    table.insert(classpaths, classpath)
-                elseif type(classpath) == 'table' then
-                    append(container, classpath)
-                end
+    for _, e in ipairs(list) do
+        if type(e) == 'table' then
+            for _, ie in ipairs(flatten(e)) do
+                table.insert(flat, ie)
             end
+        else
+            table.insert(flat, e)
         end
-        append(classpaths, arguments)
+    end
 
-        jclass.attrs.classpaths= classpaths
-    else
+    return flat
+end
+
+function jclass.classpath(...)
+    local classpaths= {...}
+
+    if #(classpaths) == 0 then
         return jclass.attrs.classpaths or {}
     end
+
+    jclass.attrs.classpaths= flatten(classpaths)
 end
 
 function jclass:package_name()

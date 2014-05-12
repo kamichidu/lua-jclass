@@ -22,4 +22,18 @@ subtest('class', function()
     end
 end)
 
+subtest('jclass.classpath()', function()
+    jclass.classpath(nil)
+    is_deeply(jclass.classpath(), {})
+
+    jclass.classpath({})
+    is_deeply(jclass.classpath(), {})
+
+    jclass.classpath('hoge', 'fuga')
+    is_deeply(jclass.classpath(), {'hoge', 'fuga'})
+
+    jclass.classpath({'hoge', 'fuga'})
+    is_deeply(jclass.classpath(), {'hoge', 'fuga'})
+end)
+
 done_testing()
