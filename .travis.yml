@@ -35,6 +35,7 @@ install:
     - luarocks-$LUA_VER --local install lua-testmore
     - luarocks-$LUA_VER --local install prototype
     - sudo apt-get install libzzip-dev
+    - luarocks-$LUA_VER --local install luasec
     - luarocks-$LUA_VER --local install $LUAZIP_ROCKSPEC
 
 script: prove --recurse --exec lua$LUA_SFX
