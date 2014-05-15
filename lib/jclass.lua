@@ -215,18 +215,23 @@ end
 function jclass:interfaces() -- {{{
     local interfaces= iterators.make_iterator(self:raw().interfaces)
 
-    -- TODO
     return iterators.transform(interfaces, function(input)
-        local class_info= self:constant_pools()[input]
+        local const_class= self:constant_pools()[input]
 
-        return 'TODO'
+        return self:index2string(const_class.name_index)
     end)
 end
 -- }}}
 
 function jclass:superclass() -- {{{
-    -- TODO
-    return ''
+    if self:raw().super_class ~= 0 then
+        local const_class= self:constant_pools()[self:raw().super_class]
+
+        return self:index2string(const_class.name_index)
+    else
+        -- this_class == 'java.lang.Object'
+        return nil
+    end
 end
 -- }}}
 

@@ -15,7 +15,7 @@ subtest('class', function()
     is(jc:canonical_name() , 'java.util.Map' , 'canonical name')
     is(jc:simple_name()    , 'Map'           , 'simple name')
 
-    local classes= jc:declared_classes()
+    local classes= jc:classes()
     type_ok(classes, 'function')
     for class in classes do
         print(class)
