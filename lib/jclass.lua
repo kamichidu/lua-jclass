@@ -363,6 +363,10 @@ returns all fields as jfield object this class has.
 
 returns all methods as jmethod object this class has.
 
+=item B<jclass:classes()>
+
+returns all innter classes as jclass object this class has.
+
 =item B<jclass:interfaces()>
 
 returns all implemented interface names.
