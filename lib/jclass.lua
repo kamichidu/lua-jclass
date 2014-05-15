@@ -66,7 +66,9 @@ end
 -- }}}
 
 function jclass.for_name(canonical_name) -- {{{
-    local zip= require 'zip'
+    local _, zip= pcall(function()
+        require 'zip'
+    end)
 
     for _, classpath in ipairs(jclass.classpath()) do
         local ok, file= pcall(function()
