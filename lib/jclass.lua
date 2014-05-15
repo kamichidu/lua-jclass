@@ -16,7 +16,7 @@ local jclass= prototype {
 
 jclass.attrs= {}
 
-function jclass.parse_file(filename)
+function jclass.parse_file(filename) -- {{{
     local file
     local ok, ret= pcall(function()
         local err
@@ -39,8 +39,9 @@ function jclass.parse_file(filename)
 
     return ret
 end
+-- }}}
 
-function jclass.parse(file)
+function jclass.parse(file) -- {{{
     local jc= jclass:clone()
 
     jc.attrs.raw= class_file.parse(file)
@@ -51,6 +52,8 @@ function jclass.parse(file)
 
     return jc:mixin(flags,
         'is_public',
+        'is_protected',
+        'is_private',
         'is_final',
         'is_super',
         'is_interface',
@@ -60,8 +63,9 @@ function jclass.parse(file)
         'is_enum'
     )
 end
+-- }}}
 
-function jclass.for_name(canonical_name)
+function jclass.for_name(canonical_name) -- {{{
     local zip= require 'zip'
 
     for _, classpath in ipairs(jclass.classpath()) do
@@ -92,9 +96,10 @@ function jclass.for_name(canonical_name)
 
     return nil
 end
+-- }}}
 
 -- TODO: modulize
-local function flatten(list)
+local function flatten(list) -- {{{
     local flat= {}
 
     for _, e in ipairs(list) do
@@ -109,8 +114,9 @@ local function flatten(list)
 
     return flat
 end
+-- }}}
 
-function jclass.classpath(...)
+function jclass.classpath(...) -- {{{
     local classpaths= {...}
 
     if #(classpaths) == 0 then
@@ -119,8 +125,9 @@ function jclass.classpath(...)
 
     jclass.attrs.classpaths= flatten(classpaths)
 end
+-- }}}
 
-function jclass:package_name()
+function jclass:package_name() -- {{{
     local fully_name= self:canonical_name()
 
     local parts= {}
@@ -134,26 +141,23 @@ function jclass:package_name()
         return parts[1]
     end
 end
+-- }}}
 
-function jclass:canonical_name()
+function jclass:canonical_name() -- {{{
     local const_class= self:constant_pools()[self:raw().this_class]
     local name= self:index2string(const_class.name_index)
     local canonical_name= name:gsub('[/$]', '.')
 
     return canonical_name
 end
+-- }}}
 
-function jclass:simple_name()
+function jclass:simple_name() -- {{{
     return self:canonical_name():match('%w+$')
 end
+-- }}}
 
-function jclass:classes()
-    return iterators.filter(self:declared_classes(), function(input)
-        return input:is_public()
-    end)
-end
-
-function jclass:declared_classes()
+function jclass:classes() -- {{{
     local attr_inner_classes= iterators.find(
         iterators.make_iterator(self:attributes()),
         function(input)
@@ -175,14 +179,9 @@ function jclass:declared_classes()
         end
     )
 end
+-- }}}
 
-function jclass:constructors()
-    return iterators.filter(self:declared_constructors(), function(input)
-        return input:is_public()
-    end)
-end
-
-function jclass:declared_constructors()
+function jclass:constructors() -- {{{
     local methods= iterators.make_iterator(self:raw().methods)
     local methods= iterators.transform(methods, function(input)
         return jmethod.new(self:constant_pools(), input)
@@ -191,29 +190,18 @@ function jclass:declared_constructors()
         return input:name() == '<init>' or input:name() == '<cinit>' or input:name() == '<clinit>'
     end)
 end
+-- }}}
 
-function jclass:fields()
-    return iterators.filter(self:declared_fields(), function(input)
-        -- return input:is_public()
-        return input:is_private()
-    end)
-end
-
-function jclass:declared_fields()
+function jclass:fields() -- {{{
     local fields= iterators.make_iterator(self:raw().fields)
     local fields= iterators.transform(fields, function(input)
         return jfield.new(self:constant_pools(), input)
     end)
     return fields
 end
+-- }}}
 
-function jclass:methods()
-    return iterators.filter(self:declared_methods(), function(input)
-        return input:is_public()
-    end)
-end
-
-function jclass:declared_methods()
+function jclass:methods() -- {{{
     local methods= iterators.make_iterator(self:raw().methods)
     local methods= iterators.transform(methods, function(input)
         return jmethod.new(self:constant_pools(), input)
@@ -222,75 +210,25 @@ function jclass:declared_methods()
         return input:name() ~= '<init>' and input:name() ~= '<cinit>' and input:name() ~= '<clinit>'
     end)
 end
+-- }}}
 
-function jclass:annotations()
-end
+function jclass:interfaces() -- {{{
+    local interfaces= iterators.make_iterator(self:raw().interfaces)
 
-function jclass:declared_annotations()
-end
+    -- TODO
+    return iterators.transform(interfaces, function(input)
+        local class_info= self:constant_pools()[input]
 
-function jclass:component_type()
+        return 'TODO'
+    end)
 end
+-- }}}
 
-function jclass:declaring_class()
+function jclass:superclass() -- {{{
+    -- TODO
+    return ''
 end
-
-function jclass:enclosing_class()
-end
-
-function jclass:enclosing_constructor()
-end
-
-function jclass:enclosing_method()
-end
-
-function jclass:enum_constants()
-end
-
-function jclass:interfaces()
-end
-
-function jclass:superclass()
-end
-
-function jclass:type_parameters()
-end
-
-function jclass:is_annotation()
-end
-
-function jclass:is_anonymouse_class()
-end
-
-function jclass:is_array()
-end
-
-function jclass:is_enum()
-end
-
-function jclass:is_interface()
-end
-
-function jclass:is_local_class()
-end
-
-function jclass:is_member_class()
-end
-
-function jclass:is_primitive()
-end
-
-function jclass:is_synthetic()
-end
-
-function jclass:is_public()
-end
-
-function jclass:is_protected()
-end
-
-function jclass:is_private()
-end
+-- }}}
 
 -- utilities {{{
 function jclass:raw()
@@ -380,21 +318,18 @@ jclass provides a L<prototype> object.
 
 =over 4
 
-=item B<jclass.parse_file(filename)>
+=item jclass.parse_file(filename)
 
-this method will create a new jclass object from file.
+this method will create a new jclass object from given filename.
 
-=item B<jclass.for_name(canonical_name)>
+=item jclass.for_name(canonical_name)
 
 TODO
 
-=item B<jclass.classpath()>
+=item jclass.classpath(...)
 
 get current classpath string of list.
-
-=item B<jclass.classpath(classpaths)>
-
-set new classpath string of list.
+or set new classpath string of list.
 
 =back
 
@@ -402,76 +337,76 @@ set new classpath string of list.
 
 =over 4
 
-=item B<jclass:package_name()>
+=item jclass:package_name()
 
-=item B<jclass:canonical_name()>
+returns package name for this class.
+e.g. java.lang.Object => java.lang
 
-=item B<jclass:simple_name()>
+=item jclass:canonical_name()
 
-=item B<jclass:classes()>
+returns canonical name for this class.
+e.g. java.lang.Object => java.lang.Object
 
-=item B<jclass:declared_classes()>
+=item jclass:simple_name()
 
-=item B<jclass:constructors()>
+returns simple name for this class.
+e.g. java.lang.Object => Object
 
-=item B<jclass:declared_constructors()>
+=item jclass:constructors()
 
-=item B<jclass:fields()>
+returns all constructors as jmethod this class has.
 
-=item B<jclass:declared_fields()>
+=item jclass:fields()
 
-=item B<jclass:methods()>
+returns all fields as jfield object this class has.
 
-=item B<jclass:declared_methods()>
+=item jclass:methods()
 
-=item B<jclass:annotations()>
+returns all methods as jmethod object this class has.
 
-returns all annotations present on this class.
-this method will return a empty table if no annotations presented.
+=item jclass:interfaces()
 
-=item B<jclass:declared_annotations()>
+returns all implemented interface names.
 
-=item B<jclass:component_type()>
+=item jclass:superclass()
 
-=item B<jclass:declaring_class()>
+returns super class name.
 
-=item B<jclass:enclosing_class()>
+=item jclass:is_public()
 
-=item B<jclass:enclosing_constructor()>
+returns true if this class is public, otherwise false.
 
-=item B<jclass:enclosing_method()>
+=item jclass:is_protected()
 
-=item B<jclass:enum_constants()>
+returns true if this class is protected, otherwise false.
 
-=item B<jclass:interfaces()>
+=item jclass:is_private()
 
-=item B<jclass:superclass()>
+returns true if this class is private, otherwise false.
 
-=item B<jclass:type_parameters()>
+=item jclass:is_final()
 
-=item B<jclass:is_annotation()>
+returns true if this class is final, otherwise false.
 
-=item B<jclass:is_anonymouse_class()>
+=item jclass:is_super()
 
-=item B<jclass:is_array()>
+TODO
 
-=item B<jclass:is_enum()>
+=item jclass:is_interface()
 
-=item B<jclass:is_interface()>
+returns true if this class is interface, otherwise false.
 
-=item B<jclass:is_local_class()>
+=item jclass:is_abstract()
 
-=item B<jclass:is_member_class()>
+returns true if this class is abstract, otherwise false.
 
-=item B<jclass:is_primitive()>
+=item jclass:is_annotation()
 
-=item B<jclass:is_synthetic()>
+returns true if this class is annotation, otherwise false.
 
-=item B<jclass:is_public()>
+=item jclass:is_enum()
 
-=item B<jclass:is_protected()>
-
-=item B<jclass:is_private()>
+returns true if this class is enum, otherwise false.
 
 =back
 
