@@ -275,7 +275,6 @@ end
 -- }}}
 
 return jclass
-
 --[[
 =pod
 
@@ -318,15 +317,15 @@ jclass provides a L<prototype> object.
 
 =over 4
 
-=item jclass.parse_file(filename)
+=item B<jclass.parse_file(filename)>
 
 this method will create a new jclass object from given filename.
 
-=item jclass.for_name(canonical_name)
+=item B<jclass.for_name(canonical_name)>
 
 TODO
 
-=item jclass.classpath(...)
+=item B<jclass.classpath(...)>
 
 get current classpath string of list.
 or set new classpath string of list.
@@ -337,74 +336,74 @@ or set new classpath string of list.
 
 =over 4
 
-=item jclass:package_name()
+=item B<jclass:package_name()>
 
 returns package name for this class.
 e.g. java.lang.Object => java.lang
 
-=item jclass:canonical_name()
+=item B<jclass:canonical_name()>
 
 returns canonical name for this class.
 e.g. java.lang.Object => java.lang.Object
 
-=item jclass:simple_name()
+=item B<jclass:simple_name()>
 
 returns simple name for this class.
 e.g. java.lang.Object => Object
 
-=item jclass:constructors()
+=item B<jclass:constructors()>
 
 returns all constructors as jmethod this class has.
 
-=item jclass:fields()
+=item B<jclass:fields()>
 
 returns all fields as jfield object this class has.
 
-=item jclass:methods()
+=item B<jclass:methods()>
 
 returns all methods as jmethod object this class has.
 
-=item jclass:interfaces()
+=item B<jclass:interfaces()>
 
 returns all implemented interface names.
 
-=item jclass:superclass()
+=item B<jclass:superclass()>
 
 returns super class name.
 
-=item jclass:is_public()
+=item B<jclass:is_public()>
 
 returns true if this class is public, otherwise false.
 
-=item jclass:is_protected()
+=item B<jclass:is_protected()>
 
 returns true if this class is protected, otherwise false.
 
-=item jclass:is_private()
+=item B<jclass:is_private()>
 
 returns true if this class is private, otherwise false.
 
-=item jclass:is_final()
+=item B<jclass:is_final()>
 
 returns true if this class is final, otherwise false.
 
-=item jclass:is_super()
+=item B<jclass:is_super()>
 
 TODO
 
-=item jclass:is_interface()
+=item B<jclass:is_interface()>
 
 returns true if this class is interface, otherwise false.
 
-=item jclass:is_abstract()
+=item B<jclass:is_abstract()>
 
 returns true if this class is abstract, otherwise false.
 
-=item jclass:is_annotation()
+=item B<jclass:is_annotation()>
 
 returns true if this class is annotation, otherwise false.
 
-=item jclass:is_enum()
+=item B<jclass:is_enum()>
 
 returns true if this class is enum, otherwise false.
 
