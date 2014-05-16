@@ -1,7 +1,7 @@
 local prototype=    require 'prototype'
 local access_flags= require 'raw.access_flags'
 local parser=       require 'util.parser_factory'
-local utf8=        require 'util.utf8'
+local utf8=         require 'util.utf8'
 
 local jmethod= prototype {
     default= prototype.assignment_copy,
@@ -10,7 +10,7 @@ local jmethod= prototype {
 
 jmethod.attrs= {}
 
-function jmethod.new(constant_pools, method_info)
+function jmethod.new(constant_pools, method_info) -- {{{
     local obj= jmethod:clone()
 
     obj.attrs.constant_pools= constant_pools
@@ -35,32 +35,16 @@ function jmethod.new(constant_pools, method_info)
         'is_synthetic'
     )
 end
+-- }}}
 
-function jmethod:name()
+function jmethod:name() -- {{{
     local const_utf8= self:constant_pools()[self:method_info().name_index]
 
     return utf8.decode(const_utf8.bytes)
 end
+-- }}}
 
-function jmethod:annotations()
-end
-
-function jmethod:declaring_class()
-end
-
-function jmethod:exception_types()
-end
-
-function jmethod:parameter_types()
-    local mdparser= parser.for_method_descriptor()
-
-    local descriptor_info= self:constant_pools()[self:method_info().descriptor_index]
-    local descriptor= mdparser:parse(utf8.decode(descriptor_info.bytes))
-
-    return descriptor.parameter_types
-end
-
-function jmethod:return_type()
+function jmethod:return_type() -- {{{
     local mdparser= parser.for_method_descriptor()
 
     local descriptor_info= self:constant_pools()[self:method_info().descriptor_index]
@@ -68,16 +52,23 @@ function jmethod:return_type()
 
     return descriptor.return_type
 end
+-- }}}
 
-function jmethod:type_parameters()
+function jmethod:parameter_types() -- {{{
+    local mdparser= parser.for_method_descriptor()
+
+    local descriptor_info= self:constant_pools()[self:method_info().descriptor_index]
+    local descriptor= mdparser:parse(utf8.decode(descriptor_info.bytes))
+
+    return descriptor.parameter_types
 end
+-- }}}
 
-function jmethod:is_bridge()
+function jmethod:exception_types() -- {{{
 end
+-- }}}
 
-function jmethod:is_var_args()
-end
-
+-- utilities {{{
 function jmethod:constant_pools()
     return self.attrs.constant_pools
 end
@@ -85,6 +76,7 @@ end
 function jmethod:method_info()
     return self.attrs.method_info
 end
+-- }}}
 
 return jmethod
 --[[
@@ -94,33 +86,61 @@ return jmethod
 
 jmethod - java class or instance method representation.
 
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
 =head2 PROVIDED METHODS
 
 =over 4
 
 =item B<jmethod:name()>
 
-=item B<jmethod:annotations()>
-
-=item B<jmethod:declaring_class()>
-
-=item B<jmethod:exception_types()>
-
-=item B<jmethod:parameter_types()>
+returns method name.
 
 =item B<jmethod:return_type()>
 
-=item B<jmethod:type_parameters()>
+returns method return type name.
 
-=item B<jmethod:is_bridge()>
+=item B<jmethod:parameter_types()>
 
-=item B<jmethod:is_var_args()>
+returns parameter type names.
 
-default_value() XXX: annotation only
+=item B<jmethod:exception_types()>
+
+returns exception type names is declarated on throws clause.
+
+=item B<jmethod:is_public()>
+
+returns true if this is public scoped, otherwise false.
+
+=item B<jmethod:is_protected()>
+
+returns true if this is protected scoped, otherwise false.
+
+=item B<jmethod:is_private()>
+
+returns true if this is private scoped, otherwise false.
+
+=item B<jmethod:is_static()>
+
+returns true if this is static method, otherwise false.
+
+=item B<jmethod:is_final()>
+
+returns true if this is final, otherwise false.
+
+=item B<jmethod:is_synchronized()>
+
+returns true if this has synchronized modifier, otherwise false.
+
+=item B<jmethod:is_varargs()>
+
+returns true if this is variadic arguments method, otherwise false.
+
+=item B<jmethod:is_native()>
+
+returns true if this is native method, otherwise false.
+
+=item B<jmethod:is_abstract()>
+
+returns true if this is abstract method, otherwise false.
 
 =back
 
@@ -134,3 +154,4 @@ see `LICENSE' file.
 
 =cut
 --]]
+-- vim:fen:fdm=marker
