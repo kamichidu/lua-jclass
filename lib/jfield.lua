@@ -10,7 +10,7 @@ local jfield= prototype {
 
 jfield.attrs= {}
 
-function jfield.new(constant_pools, field_info)
+function jfield.new(constant_pools, field_info) -- {{{
     assert(constant_pools, 'ensure non-nil')
     assert(field_info, 'ensure non-nil')
 
@@ -35,8 +35,16 @@ function jfield.new(constant_pools, field_info)
         'is_enum'
     )
 end
+-- }}}
 
-function jfield:type()
+function jfield:name() -- {{{
+    local const_utf8= self:constant_pools()[self:field_info().name_index]
+
+    return utf8.decode(const_utf8.bytes)
+end
+-- }}}
+
+function jfield:type() -- {{{
     local fdparser= parser.for_field_descriptor()
 
     local descriptor_info= self:constant_pools()[self:field_info().descriptor_index]
@@ -44,19 +52,9 @@ function jfield:type()
 
     return descriptor.type
 end
+-- }}}
 
-function jfield:name()
-    local const_utf8= self:constant_pools()[self:field_info().name_index]
-
-    return utf8.decode(const_utf8.bytes)
-end
-
-function jfield:annotations()
-end
-
-function jfield:declaring_class()
-end
-
+-- utilities {{{
 function jfield:constant_pools()
     return self.attrs.constant_pools
 end
@@ -64,6 +62,7 @@ end
 function jfield:field_info()
     return self.attrs.field_info
 end
+-- }}}
 
 return jfield
 --[[
@@ -81,17 +80,45 @@ jfield - java class or instance field representation.
 
 =over 4
 
-=item B<jfield:type()>
-
 =item B<jfield:name()>
 
-=item B<jfield:annotations()>
+returns this field name.
 
-=item B<jfield:declaring_class()>
+=item B<jfield:type()>
 
-=item B<jfield:is_enum_constant()>
+returns this field type.
 
-=item B<jfield:is_synthetic()>
+=item B<jfield:is_public()>
+
+returns true if this is public, otherwise false.
+
+=item B<jfield:is_private()>
+
+returns true if this is private, otherwise false.
+
+=item B<jfield:is_protected()>
+
+returns true if this is protected, otherwise false.
+
+=item B<jfield:is_static()>
+
+returns true if this is static, otherwise false.
+
+=item B<jfield:is_final()>
+
+returns true if this is final, otherwise false.
+
+=item B<jfield:is_volatile()>
+
+returns true if this is volatile, otherwise false.
+
+=item B<jfield:is_transient()>
+
+returns true if this is transient, otherwise false.
+
+=item B<jfield:is_enum()>
+
+returns true if this is enum type, otherwise false.
 
 =back
 
@@ -105,3 +132,4 @@ see `LICENSE' file.
 
 =cut
 --]]
+-- vim:fen:fdm=marker
