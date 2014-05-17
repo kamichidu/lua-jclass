@@ -8,6 +8,7 @@ local constants= {
     static=       0x0008,
     final=        0x0010,
     synchronized= 0x0020,
+    super=        0x0020,
     bridge=       0x0040,
     volatile=     0x0040,
     transient=    0x0080,
